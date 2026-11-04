@@ -5,13 +5,6 @@ import { Placeholder } from "./Placeholder";
 
 type Ratio = "portrait" | "square" | "landscape" | "tall";
 
-const ratioValue: Record<Ratio, string> = {
-  portrait: "4 / 5",
-  square: "1 / 1",
-  landscape: "16 / 9",
-  tall: "3 / 4",
-};
-
 const exists = (src: string) => fs.existsSync(path.join(process.cwd(), "public", src));
 
 /**
@@ -57,8 +50,10 @@ export function Clip({
   }
 
   if (hasPoster) {
+    // Shape comes from the .clip--<ratio> class (not inline), so a context such
+    // as the Sanctuary's full-bleed film can override it in CSS.
     return (
-      <div className="clip__still" style={{ position: "relative", aspectRatio: ratioValue[ratio] }}>
+      <div className={`clip__still clip--${ratio}`}>
         <Image src={posterSrc} alt={label} fill sizes={sizes} style={{ objectFit: "cover" }} />
       </div>
     );

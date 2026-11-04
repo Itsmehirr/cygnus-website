@@ -54,10 +54,20 @@ export function Hero({ ready, posterReady = false, src, poster, line, founded }:
           },
         });
 
+        // The soft-white frame is the film's size plus an even border on all sides.
+        const BORDER = 12;
         tl.to(sides, { opacity: 0, duration: 0.25 }, 0)
           .to(frame, { opacity: 1, duration: 0.2 }, 0.05)
           .to(media, { scale: 0.62, duration: 0.7 }, 0)
-          .to(frame, { scale: 0.635, duration: 0.7 }, 0)
+          .to(
+            frame,
+            {
+              scaleX: () => 0.62 + (2 * BORDER) / stage.clientWidth,
+              scaleY: () => 0.62 + (2 * BORDER) / stage.clientHeight,
+              duration: 0.7,
+            },
+            0,
+          )
           .to(
             lineEl,
             {
@@ -67,6 +77,8 @@ export function Hero({ ready, posterReady = false, src, poster, line, founded }:
             },
             0,
           )
+          // The line leaves the film for the stone at about 54 %: turn it charcoal.
+          .to(lineEl, { color: "#282827", textShadow: "0 0 0 rgba(40,40,39,0)", duration: 0.12 }, 0.48)
           .to(lineEl, { opacity: 0, duration: 0.15 }, 0.85);
       });
 

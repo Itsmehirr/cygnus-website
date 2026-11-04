@@ -62,11 +62,29 @@ html {
   scroll-behavior: smooth;
 }
 
+/* The ground: Warm Beige as a light stone (limestone/travertine), in place of
+   Immersive Garden's grey plaster. Three layers, all seamless, with different
+   periods so the surface never visibly repeats: a smooth mottle field (200 px
+   source shown at 1600 px), sparse pores and hairline fissures (1000 px, lossless),
+   and a fine grain drawn by the browser. ~62 KB in all. Sections that sit on
+   the ground stay transparent so the stone runs continuously behind them. */
+:root {
+  --stone-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.22 0 0 0 0 0.19 0 0 0 0.11 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --stone-detail: url("/textures/stone-detail.webp");
+  --stone-mottle: url("/textures/stone-mottle.webp");
+}
+
+body,
+.stone {
+  background-color: var(--c-warm-beige);
+  background-image: var(--stone-grain), var(--stone-detail), var(--stone-mottle);
+  background-size: 220px 220px, 1000px 1000px, 1600px 1600px;
+  background-repeat: repeat;
+}
+
 body {
   margin: 0;
   min-height: 100dvh;
-  /* Plain Warm Beige is the ground, in place of Immersive Garden's grey. */
-  background: var(--c-warm-beige);
   color: var(--c-ink);
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -272,6 +290,11 @@ select {
 .clip {
   width: 100%;
   object-fit: cover;
+}
+
+.clip__still {
+  position: relative;
+  width: 100%;
 }
 
 .clip--landscape {
@@ -610,7 +633,7 @@ select {
 body.is-scrolled .header {
   mix-blend-mode: normal;
   color: var(--c-ink);
-  background: rgba(252, 243, 232, 0.92);
+  background: rgba(252, 243, 232, 0.86);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -626,6 +649,23 @@ body.is-scrolled .header {
 
 body.is-scrolled .header__bar {
   height: 56px;
+}
+
+/* While a Sanctuary chapter is pinned, its own header carries the mark:
+   the site wordmark and bar step aside and only "Menu" stays. */
+body.in-chapter .header {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  /* No bar here, so "Menu" blends again: dark on stone, light over the film. */
+  mix-blend-mode: difference;
+  color: var(--c-soft-white);
+}
+
+body.in-chapter .header__home {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .header__home,
@@ -916,7 +956,6 @@ body[data-home].is-docked .header__home {
 .hero {
   position: relative;
   height: 190vh;
-  background: var(--c-warm-beige);
 }
 
 .hero__stage {
@@ -925,9 +964,7 @@ body[data-home].is-docked .header__home {
   height: 100vh;
   height: 100svh;
   overflow: hidden;
-  /* The stage is its own stacking context: it needs the ground itself, or the
-     axis's `difference` blend sees transparency and the docked line stays white. */
-  background: var(--c-warm-beige);
+  /* Transparent: while the stage is held, the stone slides on beneath the card. */
 }
 
 .hero__media,
@@ -970,8 +1007,8 @@ body[data-home].is-docked .header__home {
   font-size: var(--text-lg);
 }
 
-/* One horizontal axis: wordmark · line · scroll cue. White through `difference`
-   reads over the video and stays dark once the beige ground shows. */
+/* One horizontal axis: wordmark · line · scroll cue, light over the film. The
+   line turns charcoal as it leaves the film for the stone (Hero.tsx). */
 .hero__axis {
   position: absolute;
   inset: 0;
@@ -980,7 +1017,7 @@ body[data-home].is-docked .header__home {
   align-items: center;
   padding-inline: var(--gutter);
   color: var(--c-soft-white);
-  mix-blend-mode: difference;
+  text-shadow: 0 1px 18px rgba(40, 40, 39, 0.35);
   pointer-events: none;
 }
 
@@ -1041,7 +1078,9 @@ body[data-home].is-docked .header__home {
 
 /* Route change: the new page fades in (Immersive Garden's 0.7 s cross-fade, leave instant). */
 .page-in {
-  animation: page-in 700ms cubic-bezier(0.445, 0.05, 0.55, 0.95) both;
+  /* `backwards`, not `both`: once the fade ends the wrapper must not keep a
+     stacking context, or the fixed labels' difference blend loses its backdrop. */
+  animation: page-in 700ms cubic-bezier(0.445, 0.05, 0.55, 0.95) backwards;
 }
 
 @keyframes page-in {
@@ -1324,10 +1363,9 @@ html[data-motion="reduced"] .hero__stage {
   background: var(--c-soft-white);
 }
 
-/* Resting layout: everything in document order. */
+/* Resting layout: everything in document order, on the stone. */
 .chapter__stage {
   position: relative;
-  background: var(--c-warm-beige);
 }
 
 .chapter__head {
@@ -1419,6 +1457,15 @@ html[data-motion="reduced"] .hero__stage {
   object-fit: cover;
 }
 
+/* In the engine the film (or its still) fills the whole stage. */
+.chapter--engine .chapter__full .clip,
+.chapter--engine .chapter__full .clip__still,
+.chapter--engine .chapter__full .ph {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+}
+
 .chapter__veil {
   position: absolute;
   inset: 0;
@@ -1428,12 +1475,15 @@ html[data-motion="reduced"] .hero__stage {
 }
 
 /* A quiet scrim along the foot of the film so the title reads on any footage. */
+/* Quiet scrims at the head and foot of the film so the header and the title
+   read on any footage. */
 .chapter--engine .chapter__full::after {
   content: "";
   position: absolute;
-  inset: auto 0 0 0;
-  height: 45%;
-  background: linear-gradient(to top, rgba(40, 40, 39, 0.55), transparent);
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(40, 40, 39, 0.5), transparent 26%),
+    linear-gradient(to top, rgba(40, 40, 39, 0.55), transparent 45%);
   pointer-events: none;
 }
 
@@ -1483,8 +1533,14 @@ html[data-motion="reduced"] .hero__stage {
   z-index: 4;
   padding-top: calc(72px + 6px);
   border-top: 0;
-  background: linear-gradient(to bottom, var(--c-warm-beige) 70%, transparent);
   border-bottom-color: transparent;
+  color: var(--c-ink);
+}
+
+/* In the engine the header follows its own colour (it turns light over the film). */
+.chapter--engine .chapter__side {
+  color: inherit;
+  opacity: 0.7;
 }
 
 .chapter--engine .chapter__head::after {
@@ -1494,7 +1550,8 @@ html[data-motion="reduced"] .hero__stage {
   right: var(--gutter);
   bottom: 0;
   height: 1px;
-  background: var(--c-line);
+  background: currentColor;
+  opacity: 0.16;
 }
 
 .chapter--engine .chapter__arcade {
@@ -1542,8 +1599,6 @@ html[data-motion="reduced"] .hero__stage {
 .chapter--engine .chapter__panels {
   position: relative;
   z-index: 5;
-  background: var(--c-warm-beige);
-  margin-top: -1px;
 }
 
 /* Panels: the diagonal flow (image one side, text the other, next image peeking). */
@@ -1633,7 +1688,6 @@ html[data-motion="reduced"] .hero__stage {
   padding: 10px 18px;
   background: var(--c-soft-white);
   border: 1px solid var(--c-line-strong);
-  box-shadow: 0 0 0 4px var(--c-warm-beige);
   font-size: var(--text-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1806,7 +1860,9 @@ html[data-pointer="custom"] button {
   place-content: center;
   gap: 18px;
   justify-items: center;
-  background: var(--c-warm-beige);
+  background-color: var(--c-warm-beige);
+  background-image: var(--stone-grain), var(--stone-detail), var(--stone-mottle);
+  background-size: 220px 220px, 1000px 1000px, 1600px 1600px;
 }
 
 html.is-opening {

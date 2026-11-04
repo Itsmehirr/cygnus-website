@@ -100,6 +100,7 @@ export function Chapter({ slug, name, numeral, ground, framed, windows, full, pa
             scrub: 0.5,
             invalidateOnRefresh: true,
             onUpdate: scaleWindows,
+            onToggle: (self) => document.body.classList.toggle("in-chapter", self.isActive),
             onRefresh: () => {
               scaleWindows();
               applyClip();
@@ -111,12 +112,17 @@ export function Chapter({ slug, name, numeral, ground, framed, windows, full, pa
           .fromTo(track, { x: xStart }, { x: xEnd, duration: 0.42 }, 0.03)
           .set(fullEl, { autoAlpha: 1 }, 0.47)
           .fromTo(expand, { t: 0 }, { t: 1, duration: 0.18, ease: "power2.inOut", onUpdate: applyClip }, 0.47)
+          // As the film reaches the header, the header turns light over it.
+          .to(head, { color: "#fffdfa", duration: 0.06 }, 0.56)
           .to(track, { opacity: 0, duration: 0.06 }, 0.52)
           .fromTo(title, { xPercent: 60, opacity: 0 }, { xPercent: -10, opacity: 1, duration: 0.22 }, 0.52)
           .to(title, { xPercent: -45, opacity: 0, duration: 0.12 }, 0.78)
           .to(veil, { opacity: 0.6, duration: 0.14 }, 0.82);
 
-        return () => section.classList.remove("chapter--engine");
+        return () => {
+          section.classList.remove("chapter--engine");
+          document.body.classList.remove("in-chapter");
+        };
       });
     },
     { scope: root },
