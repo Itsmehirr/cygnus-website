@@ -26,8 +26,11 @@ export async function submitEnquiry(
 
   const name = field(formData, "name", 120);
   const email = field(formData, "email", 200);
+  const phone = field(formData, "phone", 60);
+  const location = field(formData, "location", 120);
   const message = field(formData, "message");
   const pieceSlug = field(formData, "piece", 120);
+  const appointment = field(formData, "intent", 20) === "appointment";
   const piece = getPiece(pieceSlug);
 
   if (!name || !EMAIL.test(email)) {
@@ -37,15 +40,18 @@ export async function submitEnquiry(
     };
   }
 
-  const subject = `Enquiry — ${piece?.name ?? "Cygnus"}`;
+  const subject = `${appointment ? "Private appointment" : "Enquiry"} — ${piece?.name ?? "Cygnus"}`;
   const toHouse = await sendMail({
     to: houseInbox(),
     subject,
     replyTo: email,
     text: [
-      `Piece: ${piece?.name ?? "(unspecified)"} (${pieceSlug || "n/a"})`,
+      `Piece: ${piece?.name ?? "(unspecified)"} (${piece?.reference ?? pieceSlug ?? "n/a"})`,
+      `Request: ${appointment ? "private appointment" : "enquiry"}`,
       `Name: ${name}`,
       `Email: ${email}`,
+      `Phone: ${phone || "—"}`,
+      `Location: ${location || "—"}`,
       "",
       message || "(no message)",
     ].join("\n"),
@@ -61,11 +67,13 @@ export async function submitEnquiry(
   // Acknowledgement to the visitor.
   await sendMail({
     to: email,
-    subject: `Cygnus — your enquiry${piece ? `: ${piece.name}` : ""}`,
+    subject: `Cygnus — your ${appointment ? "appointment request" : "enquiry"}${piece ? `: ${piece.name}` : ""}`,
     text: [
       `Thank you, ${name}.`,
       "",
-      `Your enquiry${piece ? ` about ${piece.name}` : ""} has reached the house. We reply personally and in order.`,
+      appointment
+        ? `Your request for a private appointment${piece ? ` to see ${piece.name}` : ""} has reached the house. We will write to you with times.`
+        : `Your enquiry${piece ? ` about ${piece.name}` : ""} has reached the house. We reply personally and in order.`,
       "",
       "Cygnus",
     ].join("\n"),

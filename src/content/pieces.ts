@@ -14,10 +14,17 @@ export type Piece = {
   metal?: string;
   geometry?: string;
   stones?: string;
+  dimensions?: string;
+  /** House reference, shown under the price line. */
+  reference?: string;
   images: PieceImage[];
   /** Until the house supplies final details, the page shows "Details to follow". */
   placeholder?: boolean;
 };
+
+/** Care guidance shared by every piece until the house supplies its own. TODO: confirm. */
+export const careNote =
+  "Store the piece on its own, away from other jewellery. Keep it from cosmetics and perfume, and clean it with a soft cloth. The house will care for any piece on request.";
 
 /**
  * Placeholder pieces so every route in the sitemap renders.
@@ -26,6 +33,7 @@ export type Piece = {
 export const pieces: Piece[] = [
   {
     slug: "pearl-ring",
+    reference: "CYG-PRL-01",
     name: "Pearl Ring",
     collection: "pearl",
     category: "rings",
@@ -39,6 +47,7 @@ export const pieces: Piece[] = [
   },
   {
     slug: "pearl-earrings",
+    reference: "CYG-PRL-02",
     name: "Pearl Earrings",
     collection: "pearl",
     category: "earrings",
@@ -52,6 +61,7 @@ export const pieces: Piece[] = [
   },
   {
     slug: "pearl-necklace",
+    reference: "CYG-PRL-03",
     name: "Pearl Necklace",
     collection: "pearl",
     category: "necklaces",
@@ -65,6 +75,7 @@ export const pieces: Piece[] = [
   },
   {
     slug: "pearl-bracelet",
+    reference: "CYG-PRL-04",
     name: "Pearl Bracelet",
     collection: "pearl",
     category: "bracelets",

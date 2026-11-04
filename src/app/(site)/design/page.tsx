@@ -21,7 +21,7 @@ export default function DesignPage() {
           <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Design", href: "/design" }]} />
           <div className="split">
             <div className="stack">
-              <p className="eyebrow">Design</p>
+              <p className="label">Design</p>
               <h1 className="display-1">Thought, given form.</h1>
               <p className="lede">
                 Cygnus crafts design-forward high jewellery anchored by
@@ -46,7 +46,7 @@ export default function DesignPage() {
         <div className="container stack--loose">
           <div className="split split--reverse">
             <div className="stack">
-              <p className="eyebrow">The geometry of light</p>
+              <p className="label">The geometry of light</p>
               <h2 id="geometry" className="display-2">
                 A study in proportion, reflection and movement.
               </h2>
@@ -75,7 +75,7 @@ export default function DesignPage() {
 
       <section className="section" aria-labelledby="pillars">
         <div className="container stack--loose">
-          <h2 id="pillars" className="eyebrow">
+          <h2 id="pillars" className="label">
             Three principles
           </h2>
           <Pillars />
@@ -84,7 +84,7 @@ export default function DesignPage() {
 
       <section className="section band--white textured" aria-labelledby="essence">
         <div className="container--narrow stack--loose">
-          <p className="eyebrow">Essence</p>
+          <p className="label">Essence</p>
           <h2 id="essence" className="display-2">
             Engineered beauty.
           </h2>
@@ -98,7 +98,7 @@ export default function DesignPage() {
 
       <section className="section" aria-labelledby="manifesto">
         <div className="container--narrow stack--loose">
-          <h2 id="manifesto" className="eyebrow">
+          <h2 id="manifesto" className="label">
             Manifesto
           </h2>
           <div className="manifesto-lines">

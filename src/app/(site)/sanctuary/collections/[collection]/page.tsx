@@ -55,7 +55,7 @@ export default async function CollectionPage({
       />
       <div className="split">
         <div className="stack">
-          <p className="eyebrow">Collection</p>
+          <p className="label">Collection</p>
           <h1 className="display-1">{col.name}</h1>
           <p className="lede">{col.description}</p>
           <p className="measure muted">{col.story}</p>

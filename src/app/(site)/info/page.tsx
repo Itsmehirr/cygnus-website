@@ -25,7 +25,7 @@ export default function InfoPage() {
           <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Info", href: "/info" }]} />
           <div className="split">
             <div className="stack">
-              <p className="eyebrow">Info</p>
+              <p className="label">Info</p>
               <h1 className="display-1">The house, in plain terms.</h1>
               <p className="lede">{site.definition}</p>
             </div>
@@ -54,7 +54,7 @@ export default function InfoPage() {
 
       <section className="section band--white textured" aria-labelledby="questions">
         <div className="container--narrow stack--loose">
-          <h2 id="questions" className="eyebrow eyebrow--ink">
+          <h2 id="questions" className="label">
             Questions, answered
           </h2>
           <div className="faq">
@@ -70,7 +70,7 @@ export default function InfoPage() {
 
       <section className="section" aria-labelledby="contact">
         <div className="container--narrow stack--loose">
-          <h2 id="contact" className="eyebrow">
+          <h2 id="contact" className="label">
             Write to us
           </h2>
           <p className="quote">

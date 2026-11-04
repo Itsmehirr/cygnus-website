@@ -19,7 +19,7 @@ export function Cursor() {
     const d = dot.current!;
     const r = ring.current!;
     const l = label.current!;
-    document.documentElement.dataset.cursor = "custom";
+    document.documentElement.dataset.pointer = "custom";
 
     let tx = -100,
       ty = -100,
@@ -68,7 +68,7 @@ export function Cursor() {
       document.documentElement.removeEventListener("mouseleave", onLeave);
       document.removeEventListener("mouseover", onOver);
       gsap.ticker.remove(tick);
-      delete document.documentElement.dataset.cursor;
+      delete document.documentElement.dataset.pointer;
     };
   }, []);
 

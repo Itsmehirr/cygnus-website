@@ -16,7 +16,7 @@ export function SiteFooter() {
           </div>
 
           <div className="footer__col">
-            <p className="eyebrow">The house</p>
+            <p className="label">The house</p>
             {site.nav.map((item) => (
               <p key={item.href}>
                 <Link href={item.href} className="footer__link">
@@ -27,7 +27,7 @@ export function SiteFooter() {
           </div>
 
           <div className="footer__col">
-            <p className="eyebrow">Write to us</p>
+            <p className="label">Write to us</p>
             <p>
               <a href={`mailto:${site.email}`} className="footer__link">
                 {site.email}
@@ -41,7 +41,7 @@ export function SiteFooter() {
           </div>
 
           <div className="footer__col">
-            <p className="eyebrow">Elsewhere</p>
+            <p className="label">Elsewhere</p>
             {site.social.length === 0 ? (
               <p className="small faint">Profiles to follow.</p>
             ) : (

@@ -62,7 +62,7 @@ export default async function CategoryPage({
             ]}
           />
           <div className="stack">
-            <p className="eyebrow">By category</p>
+            <p className="label">By category</p>
             <h1 className="display-1">{cat.name}</h1>
             <p className="lede">{cat.line}</p>
             <p className="measure muted">{cat.description}</p>

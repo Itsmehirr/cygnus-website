@@ -27,6 +27,10 @@ export const faq = [
     a: "By enquiry. Every piece in the Sanctuary leads to a conversation with the house rather than a checkout. We reply personally and in order.",
   },
   {
+    q: "Can a piece be seen in person?",
+    a: "Yes, by private appointment. Request one from the piece’s page, or through a Cygnature registration, and the house will write to you with times.",
+  },
+  {
     q: "What is Cygnature?",
     a: "Cygnature is the bespoke service of Cygnus: a commission designed around one person, from geometry to finished piece. It begins with a registration and a note from the house.",
   },

@@ -23,7 +23,7 @@ export default function RegisterPage() {
         />
         <div className="split">
           <div className="stack">
-            <p className="eyebrow">Cygnature</p>
+            <p className="label">Cygnature</p>
             <h1 className="display-1">Register your interest.</h1>
             <p className="lede">
               Tell us a little, or nothing at all. The house writes back to
