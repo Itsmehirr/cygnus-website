@@ -58,7 +58,7 @@ export function Hero({ ready, src, poster, line, founded }: Props) {
           .to(
             lineEl,
             {
-              y: () => -(stage.clientHeight / 2 - 60),
+              y: () => -(stage.clientHeight / 2 - 84),
               scale: 0.42,
               duration: 0.62,
             },

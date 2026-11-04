@@ -581,6 +581,16 @@ select {
   /* White through `difference` reads dark on beige and light over video. */
   color: var(--c-soft-white);
   mix-blend-mode: difference;
+  transition: background-color 400ms var(--ease);
+}
+
+/* Once the page has scrolled, a quiet beige bar so nothing collides with the mark. */
+body.is-scrolled .header {
+  mix-blend-mode: normal;
+  color: var(--c-ink);
+  background: rgba(252, 243, 232, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .header__bar {
@@ -589,6 +599,11 @@ select {
   align-items: center;
   justify-content: center;
   height: 72px;
+  transition: height 400ms var(--ease);
+}
+
+body.is-scrolled .header__bar {
+  height: 56px;
 }
 
 .header__home,
@@ -1137,6 +1152,446 @@ html[data-motion="reduced"] .hero__stage {
 .closing__line {
   max-width: 20ch;
   margin-inline: auto;
+}
+
+/* ---------- Sanctuary: title band and gallery ---------- */
+
+.sanctum {
+  padding-top: calc(72px + var(--space-block));
+  padding-bottom: var(--space-block);
+}
+
+.sanctum__title {
+  font-size: clamp(3.5rem, 2rem + 7vw, 8.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+}
+
+.sanctum__lede {
+  margin-top: 28px;
+  font-family: var(--font-display);
+  font-size: var(--display-3);
+  line-height: 1.3;
+  max-width: 30ch;
+  text-wrap: balance;
+}
+
+.sanctum__cats {
+  margin-top: 36px;
+  font-size: var(--text-sm);
+}
+
+.sanctum__sep {
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  background: var(--c-line-strong);
+  vertical-align: middle;
+  margin: 0 14px;
+}
+
+.gallery {
+  margin-top: var(--space-block);
+  overflow: hidden;
+}
+
+.gallery__track {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(16px, 2.4vw, 36px);
+  padding-inline: var(--gutter);
+  width: max-content;
+  will-change: transform;
+}
+
+.gallery__item {
+  flex: 0 0 auto;
+  width: clamp(200px, 26vw, 420px);
+}
+
+.gallery__item--2 {
+  width: clamp(160px, 20vw, 320px);
+  margin-bottom: 8%;
+}
+
+.gallery__item--3 {
+  width: clamp(220px, 30vw, 480px);
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .gallery {
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .gallery__item {
+    scroll-snap-align: start;
+  }
+}
+
+/* ---------- Sanctuary: chapters ---------- */
+
+.chapter {
+  position: relative;
+}
+
+.chapter--white .chapter__panels {
+  background: var(--c-soft-white);
+}
+
+/* Resting layout: everything in document order. */
+.chapter__stage {
+  position: relative;
+  background: var(--c-warm-beige);
+}
+
+.chapter__head {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 18px var(--gutter);
+  border-top: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.chapter__side {
+  font-size: var(--text-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+}
+
+.chapter__side--right {
+  text-align: right;
+}
+
+.wordmark--chapter {
+  font-size: clamp(1.4rem, 1rem + 2vw, 2.6rem);
+  letter-spacing: 0.34em;
+  margin-right: -0.34em;
+}
+
+.chapter__pill {
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  background: var(--c-charcoal);
+  color: var(--c-soft-white);
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.chapter__arcade {
+  padding-block: clamp(48px, 7vw, 96px) clamp(24px, 4vw, 48px);
+  overflow: hidden;
+}
+
+.chapter__track {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 48px);
+  padding-inline: var(--gutter);
+  width: max-content;
+  will-change: transform;
+}
+
+.chapter__win {
+  flex: 0 0 auto;
+  width: clamp(220px, 26vw, 400px);
+  will-change: transform, opacity;
+}
+
+.win {
+  display: block;
+  position: relative;
+  background: var(--c-soft-white);
+  padding: clamp(8px, 0.9vw, 12px);
+}
+
+.win__name {
+  display: block;
+  padding: 12px 2px 2px;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--c-ink);
+}
+
+.chapter__full {
+  position: relative;
+  background: var(--c-charcoal);
+}
+
+.chapter__full .clip,
+.chapter__full .ph {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chapter__veil {
+  position: absolute;
+  inset: 0;
+  background: var(--c-charcoal);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* A quiet scrim along the foot of the film so the title reads on any footage. */
+.chapter--engine .chapter__full::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 45%;
+  background: linear-gradient(to top, rgba(40, 40, 39, 0.55), transparent);
+  pointer-events: none;
+}
+
+.chapter__title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(3rem, 2rem + 6vw, 7rem);
+  line-height: 1;
+  padding: clamp(32px, 5vw, 64px) var(--gutter) 0;
+}
+
+.chapter__panels {
+  position: relative;
+  padding-block: var(--space-block) var(--space-section);
+}
+
+/* Touch and narrow: the arcade is a native horizontal row. */
+@media (pointer: coarse), (max-width: 879px), (prefers-reduced-motion: reduce) {
+  .chapter__arcade {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .chapter__arcade::-webkit-scrollbar {
+    display: none;
+  }
+  .chapter__win {
+    width: min(72vw, 360px);
+    scroll-snap-align: center;
+  }
+  .chapter__full {
+    aspect-ratio: 16 / 9;
+    margin-inline: var(--gutter);
+  }
+}
+
+/* Engine layout: everything absolute inside the pinned stage. */
+.chapter--engine .chapter__stage {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.chapter--engine .chapter__head {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 4;
+  padding-top: calc(72px + 6px);
+  border-top: 0;
+  background: linear-gradient(to bottom, var(--c-warm-beige) 70%, transparent);
+  border-bottom-color: transparent;
+}
+
+.chapter--engine .chapter__head::after {
+  content: "";
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 0;
+  height: 1px;
+  background: var(--c-line);
+}
+
+.chapter--engine .chapter__arcade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  overflow: visible;
+}
+
+.chapter--engine .chapter__track {
+  padding-inline: 0;
+}
+
+.chapter--engine .chapter__win {
+  width: clamp(240px, 24vw, 420px);
+}
+
+.chapter--engine .chapter__full {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  will-change: clip-path;
+}
+
+.chapter--engine .chapter__title {
+  position: absolute;
+  left: 0;
+  bottom: clamp(24px, 6vh, 80px);
+  z-index: 3;
+  margin: 0;
+  padding: 0 var(--gutter);
+  font-size: clamp(5rem, 4rem + 10vw, 16rem);
+  color: var(--c-soft-white);
+  white-space: nowrap;
+  opacity: 0;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.chapter--engine .chapter__panels {
+  position: relative;
+  z-index: 5;
+  background: var(--c-warm-beige);
+  margin-top: -1px;
+}
+
+/* Panels: the diagonal flow (image one side, text the other, next image peeking). */
+.panels {
+  display: grid;
+  gap: clamp(72px, 10vw, 160px);
+}
+
+.panel {
+  display: grid;
+  gap: clamp(20px, 3vw, 40px);
+}
+
+.panel__text > * + * {
+  margin-top: 16px;
+}
+
+.panel__kicker {
+  font-size: var(--text-sm);
+  color: var(--c-ink-soft);
+}
+
+@media (min-width: 880px) {
+  .panel {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+  }
+  .panel--story .panel__text {
+    grid-column: 2 / span 7;
+  }
+  .panel--left .panel__media {
+    grid-column: 1 / span 5;
+  }
+  .panel--left .panel__text {
+    grid-column: 7 / span 5;
+    padding-top: 8%;
+  }
+  .panel--right .panel__media {
+    grid-column: 7 / span 6;
+    grid-row: 1;
+    margin-top: 10%;
+  }
+  .panel--right .panel__text {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+    padding-top: 2%;
+  }
+  .panel--end {
+    grid-template-columns: 1fr;
+    padding-top: var(--space-block);
+    border-top: 1px solid var(--c-line);
+  }
+}
+
+/* ★★ Pearl: the hairline frame on its panels. */
+.chapter--framed .panels {
+  position: relative;
+  padding: clamp(28px, 4vw, 64px);
+}
+
+.chapter--framed .panels::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--c-line-strong);
+  pointer-events: none;
+}
+
+.chapter--framed .panels::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--c-line);
+  pointer-events: none;
+}
+
+/* The floating chapter pill. */
+.pill {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(18px, 2.6vw, 32px);
+  transform: translateX(-50%);
+  z-index: 26;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px;
+  background: var(--c-soft-white);
+  border: 1px solid var(--c-line-strong);
+  box-shadow: 0 0 0 4px var(--c-warm-beige);
+  font-size: var(--text-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  white-space: nowrap;
+}
+
+.pill__bars {
+  width: 14px;
+  height: 7px;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.6;
+}
+
+/* Collections menu: two groups side by side. */
+.menu__nav--two {
+  display: grid;
+  gap: var(--space-block);
+  place-items: start center;
+}
+
+@media (min-width: 720px) {
+  .menu__nav--two {
+    grid-template-columns: 1fr 1fr;
+    place-items: start center;
+  }
+}
+
+.menu__group {
+  text-align: center;
+}
+
+.menu__kicker {
+  font-size: var(--text-sm);
+  color: var(--c-ink-faint);
+  margin-bottom: 18px;
+}
+
+.menu__item--soon .menu__name {
+  font-family: var(--font-display);
+  font-size: var(--display-4);
+  color: var(--c-ink-faint);
 }
 
 /* ---------- Chrome: pinned cue, sound, cursor, loader ---------- */

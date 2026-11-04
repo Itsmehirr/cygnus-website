@@ -40,6 +40,24 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // The header becomes a bar once the page has scrolled (body.is-scrolled).
+  useEffect(() => {
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      document.body.classList.toggle("is-scrolled", window.scrollY > 72);
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    update();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   // New route: start at the top and let triggers re-measure once the page has laid out.
   useEffect(() => {
     lenisRef.current?.scrollTo(0, { immediate: true });

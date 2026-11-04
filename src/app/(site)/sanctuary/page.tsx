@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { categories, collections } from "@/content/collections";
-import { piecesByCategory, piecesByCollection } from "@/content/pieces";
+import { piecesByCollection } from "@/content/pieces";
 import { pageMeta } from "@/lib/seo";
 import { collectionPageSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/JsonLd";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Picture } from "@/components/Picture";
+import { Clip } from "@/components/Clip";
+import { Chapter } from "@/components/sanctuary/Chapter";
+import { ChapterPill } from "@/components/sanctuary/ChapterPill";
+import { GalleryDrift } from "@/components/sanctuary/GalleryDrift";
+import { Statement } from "@/components/home/Statement";
 
 const description =
   "The Sanctuary holds the Cygnus collections: rings, earrings, necklaces and bracelets, by category or by collection. Every piece leads to an enquiry with the house.";
@@ -17,6 +21,17 @@ export const metadata: Metadata = pageMeta({
   path: "/sanctuary",
 });
 
+const moods = [
+  { src: "/images/sanctuary/mood-01.jpg", alt: "Light across a facet", label: "Light" },
+  { src: "/images/sanctuary/mood-02.jpg", alt: "A pearl against grown carbon", label: "Object" },
+  { src: "/images/sanctuary/mood-03.jpg", alt: "A piece worn, in movement", label: "Presence" },
+  { src: "/images/sanctuary/mood-04.jpg", alt: "Stone and shadow", label: "Material" },
+  { src: "/images/sanctuary/mood-05.jpg", alt: "Geometry, studied", label: "Form" },
+  { src: "/images/sanctuary/mood-06.jpg", alt: "Reflection on water", label: "Atmosphere" },
+];
+
+/* The Sanctuary: a title band, a gallery that drifts, then one chapter per
+   collection in the Capitolium grammar. Every window and panel is a real link. */
 export default function SanctuaryPage() {
   return (
     <>
@@ -28,93 +43,106 @@ export default function SanctuaryPage() {
         })}
       />
 
-      <section className="section--top">
-        <div className="container stack--loose">
-          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Sanctuary", href: "/sanctuary" }]} />
-          <div className="stack">
-            <p className="eyebrow">Sanctuary</p>
-            <h1 className="display-1">The collections.</h1>
-            <p className="lede">
-              By category, or by collection. Every piece leads to a
-              conversation with the house rather than a checkout.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ★ Sorted by category */}
-      <section className="section band--white textured" aria-labelledby="by-category">
-        <div className="container stack--loose">
-          <h2 id="by-category" className="eyebrow eyebrow--ink">
-            By category
-          </h2>
-          <div className="grid grid--4">
-            {categories.map((c) => {
-              const count = piecesByCategory(c.slug).length;
-              const cover = piecesByCategory(c.slug)[0]?.images[0];
-              return (
-                <Link key={c.slug} href={`/sanctuary/category/${c.slug}`} className="tile">
-                  <div className="tile__media">
-                    <Picture
-                      src={cover?.src ?? `/images/categories/${c.slug}.jpg`}
-                      alt={cover?.alt ?? `${c.name} by Cygnus`}
-                      ratio="tall"
-                      sizes="(min-width: 1024px) 25vw, 50vw"
-                      label={c.name}
-                    />
-                  </div>
-                  <div className="tile__body">
-                    <span className="tile__title">{c.name}</span>
-                    <span className="tile__meta">
-                      {count} {count === 1 ? "piece" : "pieces"}
-                    </span>
-                  </div>
-                  <p className="tile__line">{c.line}</p>
+      <section className="sanctum" aria-labelledby="sanctuary">
+        <div className="container">
+          <h1 id="sanctuary" className="sanctum__title">
+            Sanctuary
+          </h1>
+          <Statement
+            text="The collections of the house, by collection or by category. Every piece leads to a conversation rather than a checkout."
+            className="sanctum__lede"
+          />
+          <p className="sanctum__cats">
+            {categories.map((c, i) => (
+              <span key={c.slug}>
+                <Link href={`/sanctuary/category/${c.slug}`} className="link link--quiet" data-cursor="Open">
+                  {c.name}
                 </Link>
-              );
-            })}
-          </div>
+                {i < categories.length - 1 ? <span className="sanctum__sep" aria-hidden="true" /> : null}
+              </span>
+            ))}
+          </p>
         </div>
-      </section>
-
-      {/* ★ Sorted by collections */}
-      <section className="section textured" aria-labelledby="by-collection">
-        <div className="container stack--loose">
-          <h2 id="by-collection" className="eyebrow eyebrow--ink">
-            By collection
-          </h2>
-          <div className="grid grid--3">
-            {collections.map((col) => {
-              const cover = piecesByCollection(col.slug)[0]?.images[0];
-              return (
-                <Link key={col.slug} href={`/sanctuary/collections/${col.slug}`} className="tile">
-                  <div className="tile__media">
-                    <Picture
-                      src={cover?.src ?? `/images/collections/${col.slug}.jpg`}
-                      alt={cover?.alt ?? `${col.name} collection by Cygnus`}
-                      ratio="portrait"
-                      sizes="(min-width: 720px) 33vw, 100vw"
-                      label={`${col.name} collection`}
-                    />
-                  </div>
-                  <div className="tile__body">
-                    <span className="tile__title">{col.name}</span>
-                    <span className="tile__meta">Collection</span>
-                  </div>
-                  <p className="tile__line">{col.line}</p>
-                </Link>
-              );
-            })}
-            <div className="tile" aria-hidden="true">
-              <div className="tile__media" style={{ aspectRatio: "4 / 5", border: "1px solid var(--c-line)" }} />
-              <div className="tile__body">
-                <span className="tile__title faint">Further collections</span>
-                <span className="tile__meta">To follow</span>
+        <GalleryDrift>
+          {moods.map((m, i) => (
+            <div key={m.src} className={`gallery__item gallery__item--${(i % 3) + 1}`}>
+              <div className="card">
+                <Picture src={m.src} alt={m.alt} ratio={i % 2 ? "portrait" : "landscape"} sizes="30vw" label={m.label} />
               </div>
             </div>
-          </div>
-        </div>
+          ))}
+        </GalleryDrift>
       </section>
+
+      {collections.map((col) => {
+        const list = piecesByCollection(col.slug);
+        return (
+          <Chapter
+            key={col.slug}
+            slug={col.slug}
+            name={col.name}
+            numeral={col.numeral}
+            ground={col.ground}
+            framed={col.framed}
+            windows={[
+              ...list.map((p) => (
+                <Link key={p.slug} href={`/sanctuary/pieces/${p.slug}`} className="win" data-cursor="View">
+                  <Picture src={p.images[0].src} alt={p.images[0].alt} ratio="portrait" sizes="28vw" label={p.name} />
+                  <span className="win__name">{p.name}</span>
+                </Link>
+              )),
+              <div key="intro" className="win win--intro">
+                <Clip src={col.intro.src} poster={col.intro.poster} ratio="portrait" label={`${col.name}, the film`} />
+                <span className="win__name">{col.name}</span>
+              </div>,
+            ]}
+            full={<Clip src={col.intro.src} poster={col.intro.poster} ratio="landscape" label={`${col.name}, the film`} />}
+            panels={
+              <div className="panels container">
+                <div className="panel panel--story">
+                  <div className="panel__text">
+                    <p className="panel__kicker">Collection {col.numeral}</p>
+                    <h3 className="display-2">{col.name}</h3>
+                    <p className="lede">{col.description}</p>
+                    <p className="measure muted">{col.story}</p>
+                  </div>
+                </div>
+                {list.map((p, i) => (
+                  <div key={p.slug} className={`panel ${i % 2 ? "panel--right" : "panel--left"}`}>
+                    <Link href={`/sanctuary/pieces/${p.slug}`} className="panel__media card tile" data-cursor="View">
+                      <Picture
+                        src={p.images[i % 2 ? 1 : 0]?.src ?? p.images[0].src}
+                        alt={p.images[i % 2 ? 1 : 0]?.alt ?? p.images[0].alt}
+                        ratio={i % 2 ? "square" : "portrait"}
+                        sizes="(min-width: 880px) 40vw, 90vw"
+                        label={p.name}
+                      />
+                    </Link>
+                    <div className="panel__text">
+                      <h4 className="display-3">
+                        <Link href={`/sanctuary/pieces/${p.slug}`} data-cursor="View">
+                          {p.name}
+                        </Link>
+                      </h4>
+                      <p className="measure muted">{p.description}</p>
+                      <p>
+                        <Link href={`/sanctuary/pieces/${p.slug}`} className="link">
+                          Enquire about this piece
+                        </Link>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                <div className="panel panel--end">
+                  <p className="muted">Further collections to follow.</p>
+                </div>
+              </div>
+            }
+          />
+        );
+      })}
+
+      <ChapterPill />
     </>
   );
 }

@@ -7,7 +7,7 @@ export function Wordmark({
   size = "nav",
   as: Tag = "span",
 }: {
-  size?: "nav" | "hero" | "footer" | "inline" | "loader" | "menu";
+  size?: "nav" | "hero" | "footer" | "inline" | "loader" | "menu" | "chapter";
   as?: "span" | "div";
 }) {
   return (

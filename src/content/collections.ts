@@ -43,12 +43,18 @@ export const categories: Category[] = [
 export type Collection = {
   slug: string;
   name: string;
+  /** Roman numeral shown in the chapter header and pill. */
+  numeral: string;
   /** Short line used on tiles. */
   line: string;
   /** Explicit sentence for metadata. */
   description: string;
   /** Longer paragraph for the collection page. */
   story: string;
+  /** Ground colour of the chapter's panels. */
+  ground: "beige" | "white";
+  /** Intro film for the chapter (arcade window, then full viewport). */
+  intro: { src: string; poster: string };
   /** ★★ in the sitemap: a hairline frame treatment specific to this page. */
   framed?: boolean;
 };
@@ -57,12 +63,15 @@ export const collections: Collection[] = [
   {
     slug: "pearl",
     name: "Pearl",
+    numeral: "I",
     line: "The first collection.",
     description:
       "Pearl is the first Cygnus collection: pearls paired with the house’s engineered diamond geometries, set in noble metals.",
     // TODO: replace with the house's approved collection text.
     story:
       "Pearl is where the house begins: the oldest organic gem set against the newest geometry. Each piece holds the two in balance, so that neither explains the other.",
+    ground: "beige",
+    intro: { src: "/media/collections/pearl.mp4", poster: "/media/collections/pearl-poster.jpg" },
     framed: true,
   },
 ];
