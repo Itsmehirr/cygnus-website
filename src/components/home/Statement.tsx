@@ -24,11 +24,13 @@ export function Statement({
     () => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
+        // Colour, not opacity: the unrevealed words stay readable (and pass
+        // contrast) while they wait to be pressed into the ground.
         gsap.fromTo(
           ref.current!.querySelectorAll(".statement__w"),
-          { opacity: 0.08, y: 6 },
+          { color: "#807e79", y: 6 },
           {
-            opacity: 1,
+            color: "#282827",
             y: 0,
             ease: "none",
             stagger: 0.6,
