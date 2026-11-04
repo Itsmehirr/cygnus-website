@@ -11,6 +11,7 @@ import { Chapter } from "@/components/sanctuary/Chapter";
 import { ChapterPill } from "@/components/sanctuary/ChapterPill";
 import { GalleryDrift } from "@/components/sanctuary/GalleryDrift";
 import { Statement } from "@/components/home/Statement";
+import { LandOnHash } from "@/components/motion/LandOnHash";
 
 const description =
   "The Sanctuary holds the Cygnus collections: rings, earrings, necklaces and bracelets, by category or by collection. Every piece leads to an enquiry with the house.";
@@ -143,6 +144,7 @@ export default function SanctuaryPage() {
       })}
 
       <ChapterPill />
+      <LandOnHash />
     </>
   );
 }

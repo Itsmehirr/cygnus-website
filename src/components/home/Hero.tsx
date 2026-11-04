@@ -5,7 +5,10 @@ import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 import { Wordmark } from "@/components/Wordmark";
 
 type Props = {
+  /** The film exists at `src`. */
   ready: boolean;
+  /** Only the poster exists: show it as a still. */
+  posterReady?: boolean;
   src: string;
   poster: string;
   line: string;
@@ -20,7 +23,7 @@ type Props = {
  * wordmark. Resting state (reduced motion, no JS): a full-bleed hero with the
  * axis centred, which is also what crawlers read.
  */
-export function Hero({ ready, src, poster, line, founded }: Props) {
+export function Hero({ ready, posterReady = false, src, poster, line, founded }: Props) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -59,7 +62,7 @@ export function Hero({ ready, src, poster, line, founded }: Props) {
             lineEl,
             {
               y: () => -(stage.clientHeight / 2 - 84),
-              scale: 0.42,
+              scale: () => (window.innerWidth < 720 ? 0.62 : 0.42),
               duration: 0.62,
             },
             0,
@@ -92,6 +95,9 @@ export function Hero({ ready, src, poster, line, founded }: Props) {
               preload="metadata"
               data-story
             />
+          ) : posterReady ? (
+            // eslint-disable-next-line @next/next/no-img-element -- full-bleed hero still, sized by CSS
+            <img className="hero__video" src={poster} alt="The Cygnus story, a still from the film" fetchPriority="high" />
           ) : (
             <div className="hero__placeholder" role="img" aria-label="Story video to follow">
               <span>Where light takes form.</span>

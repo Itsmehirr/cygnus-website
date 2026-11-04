@@ -25,9 +25,9 @@ export const metadata: Metadata = pageMeta({
    "no bg effects"). Order: story video → the house's statement → the making →
    the first collection → Cygnature → closing line. */
 export default function HomePage() {
-  const videoReady =
-    site.storyVideo.ready ||
-    fs.existsSync(path.join(process.cwd(), "public", site.storyVideo.src));
+  const inPublic = (p: string) => fs.existsSync(path.join(process.cwd(), "public", p));
+  const videoReady = site.storyVideo.ready || inPublic(site.storyVideo.src);
+  const posterReady = inPublic(site.storyVideo.poster);
   const featured = collections[0];
   const featuredPieces = piecesByCollection(featured.slug).slice(0, 3);
   const [makingA, makingB] = site.home.making;
@@ -38,6 +38,7 @@ export default function HomePage() {
 
       <Hero
         ready={videoReady}
+        posterReady={posterReady}
         src={site.storyVideo.src}
         poster={site.storyVideo.poster}
         line={site.home.line}

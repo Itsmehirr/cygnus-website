@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 /** The chapter menu: every collection and the four categories, on charcoal. */
 export default function SanctuaryMenuPage() {
   return (
-    <main id="main" className="menu" aria-label="Collections menu">
+    <main id="main" className="menu page-in" aria-label="Collections menu">
       <MenuGround />
       <div className="menu__top container">
         <Wordmark size="menu" as="div" />

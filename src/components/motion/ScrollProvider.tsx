@@ -58,10 +58,16 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // New route: start at the top and let triggers re-measure once the page has laid out.
+  // New route: start at the top (or at the hash target, e.g. /sanctuary#pearl)
+  // and let triggers re-measure once the page has laid out.
+  // New route: let triggers re-measure once the page has laid out. Next resets
+  // the scroll position itself; hash targets are landed by PageFade, which
+  // mounts with the new page's DOM.
   useEffect(() => {
-    lenisRef.current?.scrollTo(0, { immediate: true });
-    const id = window.setTimeout(() => ScrollTrigger.refresh(), 60);
+    const id = window.setTimeout(() => {
+      lenisRef.current?.resize();
+      ScrollTrigger.refresh();
+    }, 60);
     return () => window.clearTimeout(id);
   }, [pathname]);
 

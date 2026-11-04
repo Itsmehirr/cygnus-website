@@ -89,6 +89,27 @@ h4 {
   text-wrap: balance;
 }
 
+/* The display face is a variable font with an optical-size axis: let the
+   browser pick the display cut for headlines and the text cut for small italics. */
+.wordmark,
+h1,
+h2,
+h3,
+h4,
+.hero__line,
+.statement,
+.quote,
+.chapter__title,
+.menu__link,
+.tile__title,
+.win__name,
+.piece__h,
+.faq__q,
+.step h3,
+.approach__text {
+  font-optical-sizing: auto;
+}
+
 p {
   margin: 0;
 }
@@ -617,15 +638,21 @@ body.is-scrolled .header__bar {
   transition: opacity 600ms var(--ease);
 }
 
-/* On Home the wordmark waits for the hero line to dock. */
+/* On Home the wordmark waits for the hero line to dock (hidden from the tab order too). */
 body[data-home] .header__home {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+  transition:
+    opacity 600ms var(--ease),
+    visibility 0s 600ms;
 }
 
 body[data-home].is-docked .header__home {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  transition: opacity 600ms var(--ease);
 }
 
 .header__menu {
@@ -996,14 +1023,39 @@ body[data-home].is-docked .header__home {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto;
     align-items: start;
+    justify-items: center;
     padding-block: 96px 40px;
+  }
+  .hero__side--left {
+    justify-self: start;
   }
   .hero__line {
     align-self: center;
     white-space: normal;
+    max-width: 12ch;
   }
   .hero__side--right {
     justify-content: center;
+  }
+}
+
+/* Route change: the new page fades in (Immersive Garden's 0.7 s cross-fade, leave instant). */
+.page-in {
+  animation: page-in 700ms cubic-bezier(0.445, 0.05, 0.55, 0.95) both;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-in {
+    animation: none;
   }
 }
 
@@ -1181,6 +1233,8 @@ html[data-motion="reduced"] .hero__stage {
 }
 
 .closing__line {
+  font-family: var(--font-display);
+  font-style: italic;
   max-width: 20ch;
   margin-inline: auto;
 }

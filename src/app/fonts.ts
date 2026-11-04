@@ -27,11 +27,14 @@ export const bodyFont = localFont({
 });
 
 /**
- * Display — Chronicle Display (Hoefler&Co) is the brand's heading face.
- * It is a licensed typeface, so the files are not in this repository.
+ * Display — the brand book names Chronicle Display (Hoefler&Co), a Scotch
+ * Roman; it is licensed, so its files are not in this repository.
  *
- * Until the licensed woff2 files are added, Newsreader (a Scotch-Roman-
- * inspired open-source serif) stands in so proportions can be judged.
+ * Until the licence lands, Newsreader (Production Type, open source) stands
+ * in. It is drawn from the same Scotch-Roman tradition and ships as a
+ * variable font with an optical-size axis, so headlines take the 72 pt
+ * display cut (higher contrast, tighter fit) and small italics the text cut —
+ * the closest open match to Chronicle Display's own optical range.
  *
  * To switch: copy ChronicleDisplay-Roman.woff2 and ChronicleDisplay-Italic.woff2
  * into src/app/fonts/ and replace the `src` array below with:
@@ -41,13 +44,13 @@ export const bodyFont = localFont({
 export const displayFont = localFont({
   src: [
     {
-      path: "../../node_modules/@fontsource/newsreader/files/newsreader-latin-400-normal.woff2",
-      weight: "400",
+      path: "../../node_modules/@fontsource-variable/newsreader/files/newsreader-latin-standard-normal.woff2",
+      weight: "200 800",
       style: "normal",
     },
     {
-      path: "../../node_modules/@fontsource/newsreader/files/newsreader-latin-400-italic.woff2",
-      weight: "400",
+      path: "../../node_modules/@fontsource-variable/newsreader/files/newsreader-latin-standard-italic.woff2",
+      weight: "200 800",
       style: "italic",
     },
   ],

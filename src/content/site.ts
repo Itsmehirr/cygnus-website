@@ -3,8 +3,16 @@
  * so the same wording appears in metadata, JSON-LD, llms.txt and on the page.
  */
 
+/**
+ * Public origin for canonicals, sitemap, JSON-LD and llms.txt.
+ * Set NEXT_PUBLIC_SITE_URL once the house has its domain; until then Vercel's
+ * own production URL is used, and a local build falls back to localhost.
+ */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cygnus.example"
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000")
 ).replace(/\/$/, "");
 
 export const site = {

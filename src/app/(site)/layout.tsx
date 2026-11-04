@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PageFade } from "@/components/motion/PageFade";
 
 /** Every page except the Menu: fixed header above, charcoal footer below. */
 export default function SiteLayout({
@@ -8,8 +9,10 @@ export default function SiteLayout({
   return (
     <>
       <SiteHeader />
-      <main id="main">{children}</main>
-      <SiteFooter />
+      <PageFade>
+        <main id="main">{children}</main>
+        <SiteFooter />
+      </PageFade>
     </>
   );
 }

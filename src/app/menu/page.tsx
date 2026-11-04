@@ -18,7 +18,7 @@ export const metadata: Metadata = {
  */
 export default function MenuPage() {
   return (
-    <main id="main" className="menu" aria-label="Menu">
+    <main id="main" className="menu page-in" aria-label="Menu">
       <MenuGround />
       <div className="menu__top container">
         <Wordmark size="menu" as="div" />

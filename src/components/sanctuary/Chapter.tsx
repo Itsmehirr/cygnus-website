@@ -56,7 +56,10 @@ export function Chapter({ slug, name, numeral, ground, framed, windows, full, pa
         const veil = section.querySelector<HTMLElement>(".chapter__veil")!;
 
         const centreOf = (el: HTMLElement) => el.offsetLeft + el.offsetWidth / 2;
-        const xStart = () => stage.clientWidth / 2 - centreOf(wins[0]);
+        // Fill the row from the first frame (Capitolium): start at the gutter
+        // unless the track is narrower than the viewport, then centre the first window.
+        const gutter = () => parseFloat(getComputedStyle(stage).getPropertyValue("--gutter")) || 48;
+        const xStart = () => Math.min(gutter(), stage.clientWidth / 2 - centreOf(wins[0]));
         const xEnd = () => stage.clientWidth / 2 - centreOf(introWin);
 
         /**
@@ -82,7 +85,7 @@ export function Chapter({ slug, name, numeral, ground, framed, windows, full, pa
             const r = win.getBoundingClientRect();
             const dx = r.left + r.width / 2 - vw / 2;
             const t = Math.max(0, 1 - Math.abs(dx) / (vw * 0.7));
-            const s = 0.82 + 0.18 * t * t;
+            const s = 0.74 + 0.26 * t * t;
             gsap.set(win, { scale: s, opacity: 0.55 + 0.45 * t });
           }
         };
