@@ -3,7 +3,7 @@ import Link from "next/link";
 import { site } from "@/content/site";
 import { NavLinks } from "@/components/NavLinks";
 import { Wordmark } from "@/components/Wordmark";
-import { MenuLight } from "@/components/chrome/MenuLight";
+import { MenuGround } from "@/components/chrome/MenuGround";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function MenuPage() {
   return (
     <main id="main" className="menu" aria-label="Menu">
-      <MenuLight />
+      <MenuGround />
       <div className="menu__top container">
         <Wordmark size="menu" as="div" />
         <Link href="/" className="menu__close" data-cursor="Close">

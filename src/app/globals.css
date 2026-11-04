@@ -658,10 +658,40 @@ body[data-home].is-docked .header__home {
   overflow: hidden;
 }
 
-.menu__light {
+.menu__relief {
   position: absolute;
   inset: 0;
   z-index: -1;
+  pointer-events: none;
+  animation: relief-in 1400ms var(--ease) both;
+}
+
+.menu__relief canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+@keyframes relief-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The type must stay legible over the lit relief. */
+.menu__nav,
+.menu__top,
+.menu__foot {
+  position: relative;
+  z-index: 1;
+}
+
+.menu__light {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
   pointer-events: none;
   --lx: 62%;
   --ly: 42%;

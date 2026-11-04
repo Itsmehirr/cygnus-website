@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { categories, collections } from "@/content/collections";
 import { Wordmark } from "@/components/Wordmark";
-import { MenuLight } from "@/components/chrome/MenuLight";
+import { MenuGround } from "@/components/chrome/MenuGround";
 
 export const metadata: Metadata = {
   title: "Collections",
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function SanctuaryMenuPage() {
   return (
     <main id="main" className="menu" aria-label="Collections menu">
-      <MenuLight />
+      <MenuGround />
       <div className="menu__top container">
         <Wordmark size="menu" as="div" />
         <Link href="/sanctuary" className="menu__close" data-cursor="Close">
