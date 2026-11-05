@@ -25,19 +25,19 @@ export const metadata: Metadata = pageMeta({
 
 /* The sculpted wall: each relief belongs to a section and is placed as it
    stands when that section is centred on screen (x and w in vw, y in vh). The
-   maps are the house's stand-ins until the photographed reliefs arrive; see
-   scripts/relief.py to make or convert one. */
+   maps are made from the Higgsfield stand-in reliefs with scripts/relief.py
+   (convert); a photographed relief of the house's own replaces any of them. */
 const R = "/images/relief";
 const reliefs: Relief[] = [
-  { src: `${R}/relief-a.webp`, aspect: 1.5, anchor: ".hero", x: 70, y: -14, w: 50, depth: 0.25, rot: -6, seed: 1, phone: { x: 70, y: -31, w: 74 } },
-  { src: `${R}/relief-e.webp`, aspect: 1, anchor: ".pressed", x: 9, y: 14, w: 28, depth: 0.3, flip: true, amount: 0.8, seed: 2 },
-  { src: `${R}/relief-b.webp`, aspect: 1, anchor: ".reel", x: 90, y: -24, w: 30, depth: 0.35, seed: 3, phone: { x: 84, y: 26, w: 50 } },
-  { src: `${R}/relief-c.webp`, aspect: 1.5, anchor: ".approach", x: 50, y: -4, w: 74, depth: 0.2, amount: 0.65, seed: 4 },
-  { src: `${R}/relief-d.webp`, aspect: 1.5, anchor: ".making .band:first-child", x: 76, y: 24, w: 46, depth: 0.3, seed: 5 },
-  { src: `${R}/relief-e.webp`, aspect: 1, anchor: ".making .band--reverse", x: 18, y: 26, w: 30, depth: 0.3, rot: 12, seed: 6 },
-  { src: `${R}/relief-a.webp`, aspect: 1.5, anchor: ".teaser", x: 88, y: 40, w: 34, depth: 0.35, rot: 14, flip: true, seed: 7 },
-  { src: `${R}/relief-c.webp`, aspect: 1.5, anchor: ".bespoke", x: 22, y: -34, w: 46, depth: 0.25, flip: true, seed: 8 },
-  { src: `${R}/relief-b.webp`, aspect: 1, anchor: ".closing", x: 50, y: 0, w: 34, depth: 0.2, amount: 0.8, seed: 9 },
+  { src: `${R}/swan-flight.webp`, aspect: 1.506, anchor: ".hero", x: 60, y: -15, w: 60, depth: 0.25, seed: 1, phone: { x: 58, y: -30, w: 104 } },
+  { src: `${R}/peonies.webp`, aspect: 1, anchor: ".pressed", x: 10, y: 12, w: 28, depth: 0.3, amount: 0.85, seed: 2 },
+  { src: `${R}/constellation.webp`, aspect: 1, anchor: ".reel", x: 90, y: -24, w: 32, depth: 0.35, seed: 3, phone: { x: 82, y: 26, w: 60 } },
+  { src: `${R}/branch.webp`, aspect: 1.506, anchor: ".approach", x: 52, y: 0, w: 72, depth: 0.2, amount: 0.8, seed: 4 },
+  { src: `${R}/swan-glide.webp`, aspect: 1.506, anchor: ".making .band:first-child", x: 76, y: 26, w: 42, depth: 0.3, seed: 5 },
+  { src: `${R}/feathers.webp`, aspect: 0.664, anchor: ".making .band--reverse", x: 18, y: 22, w: 24, depth: 0.3, seed: 6 },
+  { src: `${R}/peonies.webp`, aspect: 1, anchor: ".teaser", x: 90, y: 36, w: 28, depth: 0.35, flip: true, seed: 7 },
+  { src: `${R}/branch.webp`, aspect: 1.506, anchor: ".bespoke", x: 20, y: -32, w: 44, depth: 0.25, flip: true, seed: 8 },
+  { src: `${R}/constellation.webp`, aspect: 1, anchor: ".closing", x: 50, y: 0, w: 34, depth: 0.2, amount: 0.85, seed: 9 },
 ];
 
 /* Home, in Immersive Garden's grammar on the house's stone: the axis (which is
