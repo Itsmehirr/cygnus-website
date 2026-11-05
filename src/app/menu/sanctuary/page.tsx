@@ -16,9 +16,12 @@ export default function SanctuaryMenuPage() {
     <main id="main" className="menu page-in" aria-label="Collections menu">
       <MenuGround />
       <div className="menu__top container">
-        <Wordmark size="menu" as="div" />
-        <Link href="/sanctuary" className="menu__close" data-cursor="Close">
+        <Link href="/sanctuary" className="menu__close">
           Close
+          <span className="menu__dash" aria-hidden="true" />
+        </Link>
+        <Link href="/" className="menu__mark" aria-label="Cygnus — home">
+          <Wordmark size="nav" />
         </Link>
       </div>
 

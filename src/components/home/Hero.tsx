@@ -1,131 +1,158 @@
 "use client";
 
-import { useRef } from "react";
-import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
+import { useEffect, useRef } from "react";
+import { gsap } from "@/lib/gsap";
 import { Wordmark } from "@/components/Wordmark";
 
-type Props = {
-  /** The film exists at `src`. */
-  ready: boolean;
-  /** Only the poster exists: show it as a still. */
-  posterReady?: boolean;
-  src: string;
-  poster: string;
-  line: string;
-  founded: string;
-};
+let firstLoad = true;
 
 /**
- * The Home opening: the story video full-bleed under one horizontal axis
- * (wordmark · line · scroll cue). On the first scroll the video shrinks into a
- * soft-white framed card, the side labels fade, and the line rises to dock
- * under the top edge; near the end of the section it hands over to the header
- * wordmark. Resting state (reduced motion, no JS): a full-bleed hero with the
- * axis centred, which is also what crawlers read.
+ * Immersive Garden's opening (IntroLoader), on the house's stone:
+ *
+ *   the axis builds in place: the wordmark is uncovered by a mask sweeping
+ *   left to right (2.5 s, quart.out), the line's words fade in one after
+ *   another (1 s each, sine.inOut, 0.1 s apart, from 0.3 s), the counter
+ *   on the right fades in and counts while the page settles; at 100 it hands
+ *   over to "Scroll" and the chrome (Menu, the Sanctuary cue, sound) fades in.
+ *
+ *   on the first scroll the axis lets go: words out in 0.3 s, 0.1 s apart,
+ *   and the small mark appears by "Menu"; back at the top they return
+ *   (1.25 s, 0.1 s apart, from 0.25 s).
+ *
+ * The axis is never pinned: it scrolls away with the page, as on the reference.
+ * Reduced motion, no JS: the axis is simply there.
  */
-export function Hero({ ready, posterReady = false, src, poster, line, founded }: Props) {
+export function Hero({ line, founded }: { line: string; founded: string }) {
   const root = useRef<HTMLElement>(null);
 
-  useGSAP(
-    () => {
-      const section = root.current;
-      if (!section) return;
-      document.body.dataset.home = "";
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const html = document.documentElement;
+    document.body.dataset.home = "";
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mask = el.querySelector<HTMLElement>(".hero__mark-clip")!;
+    const words = Array.from(el.querySelectorAll<HTMLElement>(".hero__word"));
+    const counter = el.querySelector<HTMLElement>(".hero__count")!;
+    const cue = el.querySelector<HTMLElement>(".hero__cue")!;
+    const mark = el.querySelector<HTMLElement>(".hero__mark")!;
 
-      const mm = gsap.matchMedia();
-      mm.add(MOTION_OK, () => {
-        const stage = section.querySelector<HTMLElement>(".hero__stage")!;
-        const media = section.querySelector<HTMLElement>(".hero__media")!;
-        const frame = section.querySelector<HTMLElement>(".hero__frame")!;
-        const lineEl = section.querySelector<HTMLElement>(".hero__line")!;
-        const sides = section.querySelectorAll<HTMLElement>(".hero__side");
+    const done = () => {
+      html.classList.remove("is-intro");
+      html.classList.add("is-ready");
+    };
 
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 0.6,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => {
-              document.body.classList.toggle("is-docked", self.progress > 0.55);
-            },
-          },
-        });
+    let intro: gsap.core.Timeline | null = null;
+    let raf = 0;
+    if (reduced) {
+      done();
+      gsap.set([mark, ...words, cue], { opacity: 1 });
+      gsap.set(counter, { opacity: 0 });
+    } else if (firstLoad) {
+      html.classList.add("is-intro");
+      gsap.set(words, { opacity: 0 });
+      gsap.set([counter, cue], { opacity: 0 });
+      intro = gsap.timeline();
+      intro
+        .fromTo(mask, { clipPath: "inset(0% 66% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 2.5, ease: "quart.out" }, 0)
+        .fromTo(words, { opacity: 0 }, { opacity: 1, duration: 1, ease: "sine.inOut", stagger: 0.1 }, 0.3)
+        .fromTo(counter, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "sine.inOut" }, ">-0.7");
 
-        // The soft-white frame is the film's size plus an even border on all sides.
-        const BORDER = 12;
-        tl.to(sides, { opacity: 0, duration: 0.25 }, 0)
-          .to(frame, { opacity: 1, duration: 0.2 }, 0.05)
-          .to(media, { scale: 0.62, duration: 0.7 }, 0)
-          .to(
-            frame,
-            {
-              scaleX: () => 0.62 + (2 * BORDER) / stage.clientWidth,
-              scaleY: () => 0.62 + (2 * BORDER) / stage.clientHeight,
-              duration: 0.7,
-            },
-            0,
-          )
-          .to(
-            lineEl,
-            {
-              y: () => -(stage.clientHeight / 2 - 84),
-              scale: () => (window.innerWidth < 720 ? 0.62 : 0.42),
-              duration: 0.62,
-            },
-            0,
-          )
-          // The line leaves the film for the stone at about 54 %: turn it charcoal.
-          .to(lineEl, { color: "#282827", textShadow: "0 0 0 rgba(40,40,39,0)", duration: 0.12 }, 0.48)
-          .to(lineEl, { opacity: 0, duration: 0.15 }, 0.85);
-      });
-
-      return () => {
-        delete document.body.dataset.home;
-        document.body.classList.remove("is-docked");
+      // The count follows the page settling (fonts, the first images), and
+      // never runs faster than the axis builds.
+      const t0 = performance.now();
+      let ready = false;
+      Promise.all([
+        document.fonts?.ready ?? Promise.resolve(),
+        new Promise<void>((r) => (document.readyState === "complete" ? r() : window.addEventListener("load", () => r(), { once: true }))),
+      ]).then(() => (ready = true));
+      let shown = 0;
+      const step = () => {
+        const t = (performance.now() - t0) / 1000;
+        const cap = ready ? 100 : 97;
+        const target = Math.min(cap, Math.round(100 * Math.min(1, t / 2.4)));
+        shown += Math.max(0, Math.ceil((target - shown) * 0.2));
+        counter.textContent = String(Math.min(100, shown));
+        if (shown >= 100 && t > 2.4) {
+          raf = 0;
+          gsap
+            .timeline({ onComplete: done })
+            .to(counter, { opacity: 0, duration: 0.5, ease: "sine.inOut" })
+            .fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "sine.inOut" }, 0.2)
+            .add(() => html.classList.add("is-ready"), 0.1);
+          return;
+        }
+        raf = requestAnimationFrame(step);
       };
-    },
-    { scope: root },
-  );
+      raf = requestAnimationFrame(step);
+    } else {
+      // Arriving from another page: no count, the axis simply returns.
+      done();
+      gsap.set(counter, { opacity: 0 });
+      gsap.fromTo(mask, { clipPath: "inset(0% 66% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "quart.out" });
+      gsap.fromTo(words, { opacity: 0 }, { opacity: 1, duration: 1.25, ease: "sine.inOut", stagger: 0.1, delay: 0.25 });
+      gsap.fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 1.25, ease: "sine.inOut", delay: 0.3 });
+    }
+    firstLoad = false;
+
+    // First scroll: the axis lets go; back at the top it returns.
+    let away = false;
+    let toggle: gsap.core.Timeline | null = null;
+    const onScroll = () => {
+      const now = window.scrollY > 40;
+      if (now === away || html.classList.contains("is-intro")) return;
+      away = now;
+      document.body.classList.toggle("is-docked", away);
+      toggle?.kill();
+      toggle = gsap.timeline();
+      if (away) {
+        toggle
+          .to(mark, { autoAlpha: 0, duration: 0.3, ease: "sine.inOut" }, 0)
+          .to(words, { opacity: 0, duration: 0.3, ease: "sine.inOut", stagger: 0.1 }, 0)
+          .to(cue, { autoAlpha: 0, duration: 0.3, ease: "sine.inOut" }, 0);
+      } else {
+        toggle
+          .to(mark, { autoAlpha: 1, duration: 0.6, ease: "sine.inOut" }, 0)
+          .to(words, { opacity: 1, duration: 1.25, ease: "sine.inOut", stagger: 0.1 }, 0.25)
+          .to(cue, { autoAlpha: 1, duration: 1.25, ease: "sine.inOut" }, 0.3);
+      }
+    };
+    if (!reduced) window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      intro?.kill();
+      toggle?.kill();
+      window.removeEventListener("scroll", onScroll);
+      delete document.body.dataset.home;
+      document.body.classList.remove("is-docked");
+      html.classList.remove("is-intro");
+      html.classList.add("is-ready");
+    };
+  }, []);
+
+  const words = line.split(" ");
 
   return (
-    <section ref={root} className="hero" aria-label="The Cygnus story">
-      <div className="hero__stage">
-        <div className="hero__frame" aria-hidden="true" />
-        <div className="hero__media">
-          {ready ? (
-            <video
-              className="hero__video"
-              src={src}
-              poster={poster}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              data-story
-            />
-          ) : posterReady ? (
-            // eslint-disable-next-line @next/next/no-img-element -- full-bleed hero still, sized by CSS
-            <img className="hero__video" src={poster} alt="The Cygnus story, a still from the film" fetchPriority="high" />
-          ) : (
-            <div className="hero__placeholder" role="img" aria-label="Story video to follow">
-              <span>Where light takes form.</span>
-            </div>
-          )}
-        </div>
-
-        <div className="hero__axis">
-          <div className="hero__side hero__side--left">
-            <Wordmark size="hero" as="div" />
-            <span className="hero__est">Est. {founded}</span>
-          </div>
-          <h1 className="hero__line">{line}</h1>
-          <span className="hero__side hero__side--right" aria-hidden="true">
-            Scroll
+    <section ref={root} className="hero" aria-label="Cygnus">
+      <div className="hero__axis container">
+        <div className="hero__mark">
+          <span className="hero__mark-clip">
+            <Wordmark size="hero" as="span" />
           </span>
+          <span className="hero__est">Est. {founded}</span>
+        </div>
+        <h1 className="hero__line">
+          {words.map((w, i) => (
+            <span key={i} className="hero__word">
+              {w}
+              {i < words.length - 1 ? " " : ""}
+            </span>
+          ))}
+        </h1>
+        <div className="hero__right" aria-hidden="true">
+          <span className="hero__count">0</span>
+          <span className="hero__cue">Scroll</span>
         </div>
       </div>
     </section>

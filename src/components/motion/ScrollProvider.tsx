@@ -34,7 +34,7 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     document.documentElement.dataset.motion = reduced ? "reduced" : "full";
     if (reduced) return;
 
-    const instance = new Lenis({ lerp: 0.08, smoothWheel: true });
+    const instance = new Lenis({ lerp: 0.05, smoothWheel: true });
     instance.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);
@@ -47,6 +47,18 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
       lenisRef.current = null;
     };
   }, []);
+
+  // Each reference keeps its own hand on the wheel: Immersive Garden's pages
+  // glide on a 0.05 lerp; the Sanctuary (Capitolium) eases every wheel step
+  // over 1.2 s, expo out.
+  useEffect(() => {
+    const l = lenisRef.current;
+    if (!l) return;
+    const capitolium = pathname.startsWith("/sanctuary");
+    l.options.lerp = capitolium ? 0.1 : 0.05;
+    l.options.duration = capitolium ? 1.2 : undefined;
+    l.options.easing = capitolium ? (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) : undefined;
+  }, [pathname]);
 
   // The header becomes a bar once the page has scrolled (body.is-scrolled).
   useEffect(() => {

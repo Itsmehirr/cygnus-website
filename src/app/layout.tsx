@@ -4,9 +4,10 @@ import { SITE_URL, site } from "@/content/site";
 import { JsonLd } from "@/components/JsonLd";
 import { ScrollProvider } from "@/components/motion/ScrollProvider";
 import { Cursor } from "@/components/chrome/Cursor";
+import { InkTransition } from "@/components/motion/InkTransition";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
-import { LOADER_GATE } from "@/lib/loader-gate";
 import "./globals.css";
+import "./story.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -50,12 +51,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // suppressHydrationWarning: the pre-paint gate below may set data-opened on <html>.
+    // suppressHydrationWarning: the opening and the navigation fade add classes to <html>.
     <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: LOADER_GATE }} />
-      </head>
       <body>
+        <noscript>
+          <style>{`.header,.see-all,.sound{opacity:1!important;pointer-events:auto!important}`}</style>
+        </noscript>
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
         <a href="#main" className="skip">
@@ -63,6 +64,7 @@ export default function RootLayout({
         </a>
         <ScrollProvider>{children}</ScrollProvider>
         <Cursor />
+        <InkTransition />
       </body>
     </html>
   );

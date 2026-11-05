@@ -23,7 +23,12 @@ export function LandOnHash() {
         return;
       }
       ScrollTrigger.refresh();
-      const y = target.getBoundingClientRect().top + window.scrollY;
+      // A room inside the pinned story lands at the start of its own scroll
+      // span (the story publishes them), not at the shared pin's top.
+      const room = target.dataset.room;
+      const offsets = target.closest<HTMLElement>(".story.is-engine")?.dataset.offsets?.split(",").map(Number);
+      const fromStory = room !== undefined && offsets ? offsets[Number(room)] : undefined;
+      const y = fromStory !== undefined && !Number.isNaN(fromStory) ? fromStory + 2 : target.getBoundingClientRect().top + window.scrollY;
       if (lenis) {
         // Lenis clamps to its cached limit, which can still be the previous
         // page's (0 on the Menu): measure again before scrolling.

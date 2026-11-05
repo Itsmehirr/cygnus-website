@@ -21,11 +21,13 @@ export function NavLinks() {
               href={item.href}
               className="menu__link"
               aria-current={current ? "page" : undefined}
-              data-cursor="Enter"
             >
               <span className="menu__name">{item.label}</span>
               <span className="menu__more" aria-hidden="true">
                 {item.line}
+              </span>
+              <span className="menu__explore" aria-hidden="true">
+                Click to explore
               </span>
               <span className="menu__num" aria-hidden="true">
                 {item.numeral}

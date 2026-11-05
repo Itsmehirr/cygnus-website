@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Wordmark } from "./Wordmark";
 
 /**
- * Fixed, transparent chrome: the wordmark centred, "Menu" at the right.
- * On Home the wordmark stays hidden until the hero line has docked
- * (body.is-docked), so the two never share the top edge.
+ * Immersive Garden's chrome: no bar, nothing centred. "Menu" sits at the top
+ * right with the small mark beside it; on Home the mark joins it only once the
+ * axis has let go (body.is-docked).
  */
 export function SiteHeader() {
   return (

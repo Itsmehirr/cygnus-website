@@ -5,17 +5,18 @@ import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 
 /**
  * Fades a block of media in once as it enters the viewport (Immersive Garden's
- * 1.9 s tile reveal). Used on framed media only, never on text.
+ * 1.9 s tile reveal). Used on media only; text has its own line reveal.
  */
 export function Reveal({
   children,
   className,
   delay = 0,
+  ...rest
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
-}) {
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "className">) {
   const ref = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -27,13 +28,14 @@ export function Reveal({
         // Already on screen when the page mounts: the page's own fade brings it
         // in. Hiding it now would blank server-rendered media for a moment.
         if (el.getBoundingClientRect().top < window.innerHeight * 0.9) return;
+        // Immersive Garden's tiles surface over ~1.9 s as they enter.
         gsap.from(el, {
           opacity: 0,
-          y: 28,
-          duration: 1.6,
+          y: 40,
+          duration: 1.9,
           delay,
           ease: "power2.out",
-          scrollTrigger: { trigger: el, start: "top 90%", once: true },
+          scrollTrigger: { trigger: el, start: "top 92%", once: true },
         });
       });
     },
@@ -41,7 +43,7 @@ export function Reveal({
   );
 
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} className={className} {...rest}>
       {children}
     </div>
   );

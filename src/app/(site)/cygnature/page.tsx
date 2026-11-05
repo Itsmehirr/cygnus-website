@@ -6,7 +6,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Picture } from "@/components/Picture";
 import { Clip } from "@/components/Clip";
 import { Reveal } from "@/components/motion/Reveal";
-import { Statement } from "@/components/home/Statement";
+import { Dissolve } from "@/components/motion/Paragraph";
 import { RegistrationForm } from "@/components/RegistrationForm";
 
 const description =
@@ -80,7 +80,7 @@ export default function CygnaturePage() {
 
       <section className="section" aria-label="The thought">
         <div className="container--narrow center">
-          <Statement
+          <Dissolve
             as="h2"
             text="One person, one geometry, one piece. Nothing is fixed until you have seen it."
             className="quote"

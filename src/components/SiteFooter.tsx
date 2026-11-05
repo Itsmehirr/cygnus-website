@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { site } from "@/content/site";
 import { Wordmark } from "./Wordmark";
+import { FooterMotion } from "./motion/FooterMotion";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
   return (
     <footer className="footer band--charcoal textured">
+      <FooterMotion />
       <div className="container">
         <Wordmark size="footer" as="div" />
 
