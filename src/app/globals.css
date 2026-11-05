@@ -185,15 +185,12 @@ select {
   outline-offset: 4px;
 }
 
+/* Reduced motion keeps every interaction (fades, reveals, the story, the
+   cursor) and drops only what moves the body of the page by itself: scroll
+   inertia (no Lenis), speed tilt, parallax drift and the menu's ambient relief. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
   }
 }
 

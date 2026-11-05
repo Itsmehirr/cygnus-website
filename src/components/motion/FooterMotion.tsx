@@ -15,15 +15,14 @@ export function FooterMotion() {
     const footer = ref.current?.closest("footer");
     if (!footer) return;
     const html = document.documentElement;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const inner = footer.querySelector<HTMLElement>(".container");
     const parts = Array.from(footer.querySelectorAll<HTMLElement>(".wordmark, .footer__col"));
     let tl: gsap.core.Timeline | null = null;
-    if (!reduced && inner) gsap.set(parts, { autoAlpha: 0 });
+    if (inner) gsap.set(parts, { autoAlpha: 0 });
     const io = new IntersectionObserver(
       ([e]) => {
         html.classList.toggle("footer-in", e.isIntersecting);
-        if (reduced || !inner) return;
+        if (!inner) return;
         if (e.isIntersecting && !tl) {
           tl = gsap.timeline();
           tl.fromTo(inner, { y: 60 }, { y: 0, duration: 2.8, ease: "expo.out" }, 0.3).to(

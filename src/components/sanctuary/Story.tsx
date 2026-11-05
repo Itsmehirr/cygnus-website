@@ -24,7 +24,9 @@ import { Hotspot } from "./Hotspot";
    page's Lenis (duration 1.2 s, expo out, as on the reference).
    ------------------------------------------------------------------------ */
 
-export const STORY_MQ = "(min-width: 880px) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
+// The story is paced by the visitor's own scroll, so it runs under reduced
+// motion too (without Lenis inertia there); only touch and narrow screens rest.
+export const STORY_MQ = "(min-width: 880px) and (pointer: fine)";
 
 export type StoryImage = { src: string; alt: string; w: number; h: number };
 export type StoryItem = {

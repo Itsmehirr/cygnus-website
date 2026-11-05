@@ -25,7 +25,6 @@ export function Cursor() {
   useEffect(() => {
     if (off) return;
     if (!window.matchMedia("(pointer: fine)").matches) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const d = dots.current!;
     const l = label.current!;
     const ds = Array.from(d.children) as HTMLElement[];

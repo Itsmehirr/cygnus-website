@@ -28,7 +28,7 @@ export function Paragraph({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!el) return;
     const s = state.current;
     s.split = SplitText.create(el, { type: "lines", linesClass: "para__line" });
     gsap.set(s.split.lines, { autoAlpha: 0 });
@@ -91,7 +91,7 @@ export function Dissolve({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!el) return;
     const chars = Array.from(el.querySelectorAll<HTMLElement>(".dissolve__c"));
     // A fixed scatter (seeded by index), so the order is the same on every visit.
     const delays = chars.map((_, i) => ((Math.sin(i * 12.9898) * 43758.5453) % 1 + 1) % 1);

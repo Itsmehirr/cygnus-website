@@ -20,7 +20,7 @@ let firstLoad = true;
  *   (1.25 s, 0.1 s apart, from 0.25 s).
  *
  * The axis is never pinned: it scrolls away with the page, as on the reference.
- * Reduced motion, no JS: the axis is simply there.
+ * Without JS the axis is simply there.
  */
 export function Hero({ line, founded }: { line: string; founded: string }) {
   const root = useRef<HTMLElement>(null);
@@ -30,7 +30,6 @@ export function Hero({ line, founded }: { line: string; founded: string }) {
     if (!el) return;
     const html = document.documentElement;
     document.body.dataset.home = "";
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const mask = el.querySelector<HTMLElement>(".hero__mark-clip")!;
     const words = Array.from(el.querySelectorAll<HTMLElement>(".hero__word"));
     const counter = el.querySelector<HTMLElement>(".hero__count")!;
@@ -44,11 +43,7 @@ export function Hero({ line, founded }: { line: string; founded: string }) {
 
     let intro: gsap.core.Timeline | null = null;
     let raf = 0;
-    if (reduced) {
-      done();
-      gsap.set([mark, ...words, cue], { opacity: 1 });
-      gsap.set(counter, { opacity: 0 });
-    } else if (firstLoad) {
+    if (firstLoad) {
       html.classList.add("is-intro");
       gsap.set(words, { opacity: 0 });
       gsap.set([counter, cue], { opacity: 0 });
@@ -117,7 +112,7 @@ export function Hero({ line, founded }: { line: string; founded: string }) {
           .to(cue, { autoAlpha: 1, duration: 1.25, ease: "sine.inOut" }, 0.3);
       }
     };
-    if (!reduced) window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(raf);

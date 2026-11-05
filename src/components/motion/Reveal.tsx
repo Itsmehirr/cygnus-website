@@ -22,7 +22,7 @@ export function Reveal({
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
-      mm.add(MOTION_OK, () => {
+      mm.add("all", () => {
         const el = ref.current;
         if (!el) return;
         // Already on screen when the page mounts: the page's own fade brings it
