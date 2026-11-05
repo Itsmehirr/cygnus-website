@@ -20,6 +20,7 @@ export function Clip({
   label = "Film to follow",
   story = false,
   sizes = "(min-width: 880px) 60vw, 100vw",
+  priority = false,
 }: {
   src: string;
   poster?: string;
@@ -27,6 +28,8 @@ export function Clip({
   label?: string;
   story?: boolean;
   sizes?: string;
+  /** Above the fold / likely LCP: preload the still and fetch it first. */
+  priority?: boolean;
 }) {
   const posterSrc = poster ?? src.replace(/\.(mp4|webm)$/, ".jpg");
   const hasVideo = exists(src);
@@ -54,7 +57,15 @@ export function Clip({
     // as the Sanctuary's full-bleed film can override it in CSS.
     return (
       <div className={`clip__still clip--${ratio}`}>
-        <Image src={posterSrc} alt={label} fill sizes={sizes} style={{ objectFit: "cover" }} />
+        <Image
+          src={posterSrc}
+          alt={label}
+          fill
+          sizes={sizes}
+          preload={priority}
+          fetchPriority={priority ? "high" : undefined}
+          style={{ objectFit: "cover" }}
+        />
       </div>
     );
   }

@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { ScrollProvider } from "@/components/motion/ScrollProvider";
 import { Cursor } from "@/components/chrome/Cursor";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
+import { LOADER_GATE } from "@/lib/loader-gate";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -49,7 +50,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`}>
+    // suppressHydrationWarning: the pre-paint gate below may set data-opened on <html>.
+    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: LOADER_GATE }} />
+      </head>
       <body>
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />

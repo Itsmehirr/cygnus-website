@@ -11,8 +11,12 @@
   --c-chartreuse: #bbbe0d; /* accent, 10% — book also lists RGB 186,190,51 (#babe33) */
 
   --c-ink: var(--c-charcoal);
-  --c-ink-soft: #6f6e6a; /* the book's light-grey body text */
-  --c-ink-faint: #a09e98;
+  /* The book's light-grey body text, taken a shade deeper so small text holds
+     WCAG AA (4.5:1) even over the darker patches of the stone ground. */
+  --c-ink-soft: #686763;
+  /* Tertiary labels (crumbs, spec terms, meta). Same tone as soft: hierarchy
+     comes from size, case and tracking, never from failing contrast. */
+  --c-ink-faint: var(--c-ink-soft);
   --c-line: rgba(40, 40, 39, 0.14);
   --c-line-strong: rgba(40, 40, 39, 0.32);
   --c-beige-deep: #f4e9da;
@@ -62,23 +66,30 @@ html {
   scroll-behavior: smooth;
 }
 
-/* The ground: Warm Beige as a light stone (limestone/travertine), in place of
-   Immersive Garden's grey plaster. Three layers, all seamless, with different
-   periods so the surface never visibly repeats: a smooth mottle field (200 px
-   source shown at 1600 px), sparse pores and hairline fissures (1000 px, lossless),
-   and a fine grain drawn by the browser. ~62 KB in all. Sections that sit on
+/* The ground: Warm Beige as a light honed limestone, modelled on the stone on
+   the brand book's Textures page, in place of Immersive Garden's grey plaster.
+   Four seamless layers with different periods, so the surface never visibly
+   repeats:
+     sand     two fine grains (dark and light), drawn by the browser;
+     detail   mineral specks, fossil slivers, calcite flecks (2x, lossless);
+     mottle   soft honey/grey-green clouding (192 px source at 1536 px).
+   The page still averages to the Warm Beige. ~85 KB, cached once.
+   Regenerate the files with scripts/stone-texture.py. Sections that sit on
    the ground stay transparent so the stone runs continuously behind them. */
 :root {
-  --stone-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.22 0 0 0 0 0.19 0 0 0 0.11 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --stone-sand: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.27 0 0 0 0 0.23 0 0 0 0 0.19 0 0 0 0.34 -0.145'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --stone-sand-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 0.98 0 0 0 0.42 -0.19'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --stone-detail: url("/textures/stone-detail.webp");
   --stone-mottle: url("/textures/stone-mottle.webp");
+  --stone-image: var(--stone-sand), var(--stone-sand-light), var(--stone-detail), var(--stone-mottle);
+  --stone-size: 220px 220px, 240px 240px, 1024px 1024px, 1536px 1536px;
 }
 
 body,
 .stone {
   background-color: var(--c-warm-beige);
-  background-image: var(--stone-grain), var(--stone-detail), var(--stone-mottle);
-  background-size: 220px 220px, 1000px 1000px, 1600px 1600px;
+  background-image: var(--stone-image);
+  background-size: var(--stone-size);
   background-repeat: repeat;
 }
 
@@ -269,10 +280,6 @@ select {
 /* ---------- Bands (colour application) ---------- */
 
 .band--white {
-  background: var(--c-warm-beige);
-}
-
-.band--white {
   background: var(--c-soft-white);
 }
 
@@ -318,7 +325,7 @@ select {
   color: var(--c-soft-white);
   --c-ink: var(--c-soft-white);
   --c-ink-soft: rgba(255, 253, 250, 0.68);
-  --c-ink-faint: rgba(255, 253, 250, 0.42);
+  --c-ink-faint: rgba(255, 253, 250, 0.58);
   --c-line: rgba(255, 253, 250, 0.16);
   --c-line-strong: rgba(255, 253, 250, 0.38);
 }
@@ -722,7 +729,7 @@ body[data-home].is-docked .header__home {
   color: var(--c-soft-white);
   --c-ink: var(--c-soft-white);
   --c-ink-soft: rgba(255, 253, 250, 0.66);
-  --c-ink-faint: rgba(255, 253, 250, 0.4);
+  --c-ink-faint: rgba(255, 253, 250, 0.58);
   overflow: hidden;
 }
 
@@ -1090,6 +1097,12 @@ body[data-home].is-docked .header__home {
   to {
     opacity: 1;
   }
+}
+
+/* The first document paints at once; only pages reached by navigation fade
+   (html[data-navigated] is set by ScrollProvider before that page paints). */
+html:not([data-navigated]) .page-in {
+  animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1861,24 +1874,71 @@ html[data-pointer="custom"] button {
   gap: 18px;
   justify-items: center;
   background-color: var(--c-warm-beige);
-  background-image: var(--stone-grain), var(--stone-detail), var(--stone-mottle);
-  background-size: 220px 220px, 1000px 1000px, 1600px 1600px;
+  background-image: var(--stone-image);
+  background-size: var(--stone-size);
 }
 
-html.is-opening {
-  overflow: hidden;
+/* The opening runs on CSS alone, from the first paint (not after hydration):
+   the wordmark settles from wide to its final tracking while the chartreuse
+   rule draws, then the veil lifts and stops catching the pointer. */
+.loader {
+  animation: loader-out 450ms cubic-bezier(0.445, 0.05, 0.55, 0.95) 1000ms forwards;
 }
 
-.loader__mark {
-  opacity: 0;
+.loader .wordmark {
+  animation: loader-mark 900ms cubic-bezier(0.215, 0.61, 0.355, 1) both;
 }
 
 .loader__rule {
   width: 120px;
   height: 1px;
   background: var(--c-chartreuse);
-  transform: scaleX(0);
   transform-origin: left;
+  animation: loader-rule 700ms cubic-bezier(0.455, 0.03, 0.515, 0.955) 150ms both;
+}
+
+/* Seen once this session (set before first paint), or motion reduced: never shown. */
+html[data-opened] .loader {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    display: none;
+  }
+}
+
+html.is-opening {
+  overflow: hidden;
+}
+
+@keyframes loader-mark {
+  from {
+    opacity: 0;
+    letter-spacing: 0.6em;
+    margin-right: -0.6em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: var(--tracking-wordmark);
+    margin-right: calc(-1 * var(--tracking-wordmark));
+  }
+}
+
+@keyframes loader-rule {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes loader-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 .pillars {

@@ -22,13 +22,18 @@ export function Reveal({
     () => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        gsap.from(ref.current, {
+        const el = ref.current;
+        if (!el) return;
+        // Already on screen when the page mounts: the page's own fade brings it
+        // in. Hiding it now would blank server-rendered media for a moment.
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.9) return;
+        gsap.from(el, {
           opacity: 0,
           y: 28,
           duration: 1.6,
           delay,
           ease: "power2.out",
-          scrollTrigger: { trigger: ref.current, start: "top 90%", once: true },
+          scrollTrigger: { trigger: el, start: "top 90%", once: true },
         });
       });
     },

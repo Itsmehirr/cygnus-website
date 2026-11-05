@@ -36,6 +36,11 @@ export const bodyFont = localFont({
  * display cut (higher contrast, tighter fit) and small italics the text cut —
  * the closest open match to Chronicle Display's own optical range.
  *
+ * The files in ./fonts are the fontsource Latin cut with the weight axis
+ * pinned at 400 (the only weight the site sets) and the optical-size axis
+ * kept: 122 KB for both styles instead of 276 KB.
+ *   fonttools varLib.instancer newsreader-latin-standard-normal.woff2 wght=400
+ *
  * To switch: copy ChronicleDisplay-Roman.woff2 and ChronicleDisplay-Italic.woff2
  * into src/app/fonts/ and replace the `src` array below with:
  *   { path: "./fonts/ChronicleDisplay-Roman.woff2",  weight: "400", style: "normal" },
@@ -43,16 +48,8 @@ export const bodyFont = localFont({
  */
 export const displayFont = localFont({
   src: [
-    {
-      path: "../../node_modules/@fontsource-variable/newsreader/files/newsreader-latin-standard-normal.woff2",
-      weight: "200 800",
-      style: "normal",
-    },
-    {
-      path: "../../node_modules/@fontsource-variable/newsreader/files/newsreader-latin-standard-italic.woff2",
-      weight: "200 800",
-      style: "italic",
-    },
+    { path: "./fonts/newsreader-opsz-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/newsreader-opsz-400-italic.woff2", weight: "400", style: "italic" },
   ],
   variable: "--font-display-family",
   display: "swap",

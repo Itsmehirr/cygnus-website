@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
@@ -20,6 +20,14 @@ export const useLenis = () => useContext(LenisContext)?.current ?? null;
 export function ScrollProvider({ children }: { children: ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
+  const firstPath = useRef(pathname);
+
+  // Pages fade in (CSS .page-in) only when reached by navigation: the first
+  // document paints at once, which is both calmer and what LCP measures.
+  // A layout effect, so the flag is set before the new page's first paint.
+  useLayoutEffect(() => {
+    if (pathname !== firstPath.current) document.documentElement.setAttribute("data-navigated", "");
+  }, [pathname]);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -58,8 +66,6 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // New route: start at the top (or at the hash target, e.g. /sanctuary#pearl)
-  // and let triggers re-measure once the page has laid out.
   // New route: let triggers re-measure once the page has laid out. Next resets
   // the scroll position itself; hash targets are landed by PageFade, which
   // mounts with the new page's DOM.

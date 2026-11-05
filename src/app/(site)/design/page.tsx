@@ -35,6 +35,7 @@ export default function DesignPage() {
               alt="A Cygnus diamond geometry, studied as an object of design"
               ratio="landscape"
               sizes="(min-width: 880px) 58vw, 100vw"
+              priority
               label="Object / Form"
             />
           </div>

@@ -29,6 +29,7 @@ export function Picture({
   alt: string;
   ratio?: Ratio;
   sizes?: string;
+  /** Above the fold / likely LCP: preload it and fetch it first. */
   priority?: boolean;
   label?: string;
 }) {
@@ -42,7 +43,8 @@ export function Picture({
         alt={alt}
         fill
         sizes={sizes}
-        priority={priority}
+        preload={priority}
+        fetchPriority={priority ? "high" : undefined}
         style={{ objectFit: "cover" }}
       />
     </div>

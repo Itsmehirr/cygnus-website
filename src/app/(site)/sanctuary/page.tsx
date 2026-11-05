@@ -68,7 +68,14 @@ export default function SanctuaryPage() {
           {moods.map((m, i) => (
             <div key={m.src} className={`gallery__item gallery__item--${(i % 3) + 1}`}>
               <div className="card">
-                <Picture src={m.src} alt={m.alt} ratio={i % 2 ? "portrait" : "landscape"} sizes="30vw" label={m.label} />
+                <Picture
+                  src={m.src}
+                  alt={m.alt}
+                  ratio={i % 2 ? "portrait" : "landscape"}
+                  sizes="(min-width: 880px) 30vw, 220px"
+                  priority={i < 2}
+                  label={m.label}
+                />
               </div>
             </div>
           ))}

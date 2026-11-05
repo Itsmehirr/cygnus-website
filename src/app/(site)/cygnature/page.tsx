@@ -54,7 +54,7 @@ export default function CygnaturePage() {
           <div className="bespoke__grid" style={{ marginTop: "var(--space-block)" }}>
             <Reveal className="bespoke__video">
               <div className="card">
-                <Clip src="/media/atelier.mp4" ratio="landscape" label="The atelier" />
+                <Clip src="/media/atelier.mp4" ratio="landscape" label="The atelier" priority />
               </div>
             </Reveal>
             <Reveal className="bespoke__picture" delay={0.15}>
@@ -64,6 +64,7 @@ export default function CygnaturePage() {
                   alt="A Cygnus commission in the making"
                   ratio="tall"
                   sizes="(min-width: 880px) 24vw, 60vw"
+                  priority
                   label="Presence"
                 />
               </div>
