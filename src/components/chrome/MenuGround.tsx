@@ -16,7 +16,6 @@ export function MenuGround() {
 
   useEffect(() => {
     const id = window.requestAnimationFrame(() => {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       const canvas = document.createElement("canvas");
       if (!canvas.getContext("webgl2")) return;
       const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;

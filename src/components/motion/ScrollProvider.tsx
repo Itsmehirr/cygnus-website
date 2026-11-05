@@ -8,14 +8,14 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 type LenisRef = React.MutableRefObject<Lenis | null>;
 const LenisContext = createContext<LenisRef | null>(null);
 
-/** The live Lenis instance (null under reduced motion or before mount). */
+/** The live Lenis instance (null before mount). */
 export const useLenis = () => useContext(LenisContext)?.current ?? null;
 
 /**
  * Mounts one Lenis instance for the whole app and feeds its scroll position to
  * ScrollTrigger from GSAP's ticker, so every scrubbed timeline shares one clock.
- * Skipped entirely under prefers-reduced-motion: the page then scrolls natively
- * and the motion components render their resting state.
+ * It runs whatever the system's "Reduce motion" setting says, as both
+ * references do.
  */
 export function ScrollProvider({ children }: { children: ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
@@ -30,9 +30,9 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
   }, [pathname]);
 
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.documentElement.dataset.motion = reduced ? "reduced" : "full";
-    if (reduced) return;
+    // Full motion for everyone, as on both references (the system's
+    // "Reduce motion" setting is deliberately not consulted).
+    document.documentElement.dataset.motion = "full";
 
     const instance = new Lenis({ lerp: 0.05, smoothWheel: true });
     instance.on("scroll", ScrollTrigger.update);

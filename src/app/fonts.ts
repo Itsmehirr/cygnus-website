@@ -54,3 +54,20 @@ export const displayFont = localFont({
   variable: "--font-display-family",
   display: "swap",
 });
+
+/**
+ * Script — the Sanctuary's room titles, after collabcapitolium.fr, which sets
+ * them in Edwardian Script (licensed). Pinyon Script (Nicole Fally, open
+ * source, from @fontsource) is the closest open formal roundhand.
+ */
+export const scriptFont = localFont({
+  src: [
+    {
+      path: "../../node_modules/@fontsource/pinyon-script/files/pinyon-script-latin-400-normal.woff2",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-script-family",
+  display: "swap",
+});

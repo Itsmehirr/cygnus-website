@@ -26,6 +26,14 @@
   /* Type. Display: Chronicle Display (stand-in loaded via next/font). Body: Work Sans. */
   --font-display: var(--font-display-family), "Chronicle Display", Georgia, "Times New Roman", serif;
   --font-body: var(--font-body-family), "Work Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-script: var(--font-script-family), "Edwardian Script ITC", "Pinyon Script", cursive;
+
+  /* The Sanctuary's register, after collabcapitolium.fr: two golds and a slate. */
+  --c-gold: #c3a677;
+  --c-gold-light: #f0e3cf;
+  --c-slate: #58595b;
+  /* The gold taken deeper for real text on the stone (3.4:1, large text). */
+  --c-gold-deep: #9e7f4a;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -185,14 +193,8 @@ select {
   outline-offset: 4px;
 }
 
-/* Reduced motion keeps every interaction (fades, reveals, the story, the
-   cursor) and drops only what moves the body of the page by itself: scroll
-   inertia (no Lenis), speed tilt, parallax drift and the menu's ambient relief. */
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-}
+/* Full motion for every visitor, as on both references: the system's
+   "Reduce motion" setting is deliberately not consulted anywhere. */
 
 /* ---------- Layout ---------- */
 
@@ -1094,7 +1096,7 @@ html:not(.is-ready):has(.hero) .sound {
   display: inline-block;
 }
 
-/* Before scripts run (and under reduced motion) the axis is simply there. */
+/* Before scripts run the axis is simply there. */
 html:not(.is-intro):not(.is-ready) .hero__count {
   opacity: 0;
 }
@@ -1375,6 +1377,48 @@ html:not(.is-intro):not(.is-ready) .hero__count {
   will-change: opacity;
 }
 
+/* ---------- Home: the sculpted wall (Immersive Garden's plaster relief) ----------
+   One fixed WebGL layer under the page, drawing only shading onto the stone,
+   so the motifs read as carved from the ground itself. Sections stay
+   transparent; the footer's charcoal simply covers it. */
+
+.relief {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.relief canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Pixel transition (Immersive Garden's mosaic) ---------- */
+
+.pixelate {
+  position: relative;
+}
+
+.pixelate > video,
+.pixelate > div {
+  display: block;
+}
+
+.pixelate.is-pending > :not(canvas) {
+  opacity: 0;
+}
+
+.pixelate__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ---------- Sanctuary: title band and gallery ---------- */
 
 .sanctum {
@@ -1382,10 +1426,13 @@ html:not(.is-intro):not(.is-ready) .hero__count {
   padding-bottom: var(--space-block);
 }
 
+/* The Sanctuary's own title, in the rooms' gold roundhand. */
 .sanctum__title {
-  font-size: clamp(3.5rem, 2rem + 7vw, 8.5rem);
-  line-height: 0.95;
-  letter-spacing: -0.01em;
+  font-family: var(--font-script);
+  font-size: clamp(4.4rem, 2.4rem + 9vw, 11rem);
+  line-height: 1.1;
+  letter-spacing: 0;
+  color: var(--c-gold-deep);
 }
 
 .sanctum__lede {
@@ -1439,7 +1486,7 @@ html:not(.is-intro):not(.is-ready) .hero__count {
   width: clamp(220px, 30vw, 480px);
 }
 
-@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+@media (pointer: coarse) {
   .gallery {
     overflow-x: auto;
     scroll-snap-type: x proximity;
@@ -2039,21 +2086,20 @@ html:not(.is-intro):not(.is-ready) .hero__count {
   max-width: var(--measure-wide);
 }
 
-/* ---------- Reveal (subtle, reduced-motion aware) ---------- */
+/* ---------- Reveal (subtle) ---------- */
 
-@media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    animation: reveal 900ms var(--ease) both;
+.reveal {
+  animation: reveal 900ms var(--ease) both;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  @keyframes reveal {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 

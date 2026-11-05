@@ -24,8 +24,8 @@ import { Hotspot } from "./Hotspot";
    page's Lenis (duration 1.2 s, expo out, as on the reference).
    ------------------------------------------------------------------------ */
 
-// The story is paced by the visitor's own scroll, so it runs under reduced
-// motion too (without Lenis inertia there); only touch and narrow screens rest.
+// Full motion on every wide, fine-pointer screen (the system's "Reduce motion"
+// setting is not consulted, as on the reference); touch and narrow screens rest.
 export const STORY_MQ = "(min-width: 880px) and (pointer: fine)";
 
 export type StoryImage = { src: string; alt: string; w: number; h: number };
@@ -445,7 +445,7 @@ function Room({ chapter, index, total }: { chapter: StoryChapter; index: number;
               <Head chapter={chapter} variant="arch" />
             </div>
             <canvas className="room__canvas" aria-hidden="true" />
-            {/* Resting arcade (touch, narrow, reduced motion): three windows onto one image. */}
+            {/* Resting arcade (touch, narrow screens): three windows onto one image. */}
             <div className="room__windows" aria-hidden="true">
               {[0, 1, 2].map((i) => (
                 <span key={i} className="room__window" style={{ backgroundImage: `url(${chapter.media.poster})` }} />

@@ -41,7 +41,7 @@ export function StoryNav({
     const onActive = (e: Event) => setVisible((e as CustomEvent<boolean>).detail);
     document.addEventListener("story:chapter", onChapter);
     document.addEventListener("story:active", onActive);
-    // Without the engine (touch, reduced motion) the pill stays available.
+    // Without the engine (touch, narrow screens) the pill stays available.
     const raf = window.matchMedia("(min-width: 880px) and (pointer: fine)").matches ? 0 : requestAnimationFrame(() => setVisible(true));
     return () => {
       cancelAnimationFrame(raf);

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { bodyFont, displayFont } from "./fonts";
+import { bodyFont, displayFont, scriptFont } from "./fonts";
 import { SITE_URL, site } from "@/content/site";
 import { JsonLd } from "@/components/JsonLd";
 import { ScrollProvider } from "@/components/motion/ScrollProvider";
@@ -52,7 +52,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     // suppressHydrationWarning: the opening and the navigation fade add classes to <html>.
-    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable} ${scriptFont.variable}`} suppressHydrationWarning>
       <body>
         <noscript>
           <style>{`.header,.see-all,.sound{opacity:1!important;pointer-events:auto!important}`}</style>

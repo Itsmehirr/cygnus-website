@@ -14,7 +14,6 @@ export function MenuLight() {
 
   useEffect(() => {
     const el = ref.current!;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const fine = window.matchMedia("(pointer: fine)").matches;
 
     let tx = 0.62,

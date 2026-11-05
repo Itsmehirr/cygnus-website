@@ -9,6 +9,8 @@ import { pageMeta } from "@/lib/seo";
 import { Hero } from "@/components/home/Hero";
 import { Dissolve, Paragraph } from "@/components/motion/Paragraph";
 import { ScrollTilt } from "@/components/motion/ScrollTilt";
+import { Pixelate } from "@/components/motion/Pixelate";
+import { ReliefWall, type Relief } from "@/components/home/ReliefWall";
 import { Reveal, Drift } from "@/components/motion/Reveal";
 import { SoundToggle } from "@/components/chrome/SoundToggle";
 import { Clip } from "@/components/Clip";
@@ -20,6 +22,23 @@ export const metadata: Metadata = pageMeta({
   description: site.definition,
   path: "/",
 });
+
+/* The sculpted wall: each relief belongs to a section and is placed as it
+   stands when that section is centred on screen (x and w in vw, y in vh). The
+   maps are the house's stand-ins until the photographed reliefs arrive; see
+   scripts/relief.py to make or convert one. */
+const R = "/images/relief";
+const reliefs: Relief[] = [
+  { src: `${R}/relief-a.webp`, aspect: 1.5, anchor: ".hero", x: 70, y: -14, w: 50, depth: 0.25, rot: -6, seed: 1, phone: { x: 70, y: -31, w: 74 } },
+  { src: `${R}/relief-e.webp`, aspect: 1, anchor: ".pressed", x: 9, y: 14, w: 28, depth: 0.3, flip: true, amount: 0.8, seed: 2 },
+  { src: `${R}/relief-b.webp`, aspect: 1, anchor: ".reel", x: 90, y: -24, w: 30, depth: 0.35, seed: 3, phone: { x: 84, y: 26, w: 50 } },
+  { src: `${R}/relief-c.webp`, aspect: 1.5, anchor: ".approach", x: 50, y: -4, w: 74, depth: 0.2, amount: 0.65, seed: 4 },
+  { src: `${R}/relief-d.webp`, aspect: 1.5, anchor: ".making .band:first-child", x: 76, y: 24, w: 46, depth: 0.3, seed: 5 },
+  { src: `${R}/relief-e.webp`, aspect: 1, anchor: ".making .band--reverse", x: 18, y: 26, w: 30, depth: 0.3, rot: 12, seed: 6 },
+  { src: `${R}/relief-a.webp`, aspect: 1.5, anchor: ".teaser", x: 88, y: 40, w: 34, depth: 0.35, rot: 14, flip: true, seed: 7 },
+  { src: `${R}/relief-c.webp`, aspect: 1.5, anchor: ".bespoke", x: 22, y: -34, w: 46, depth: 0.25, flip: true, seed: 8 },
+  { src: `${R}/relief-b.webp`, aspect: 1, anchor: ".closing", x: 50, y: 0, w: 34, depth: 0.2, amount: 0.8, seed: 9 },
+];
 
 /* Home, in Immersive Garden's grammar on the house's stone: the axis (which is
    also the opening), the statement, the story film as the showreel, the house
@@ -48,7 +67,9 @@ export default function HomePage() {
       <section className="reel" aria-label="The story of Cygnus">
         <Reveal className="reel__frame" data-tilt="">
           <div className="reel__media" data-cursor={videoReady ? "Watch" : undefined}>
-            <Clip src={site.storyVideo.src} poster={posterReady ? site.storyVideo.poster : undefined} ratio="landscape" label="The story of Cygnus" story sizes="(min-width: 880px) 65vw, 100vw" />
+            <Pixelate>
+              <Clip src={site.storyVideo.src} poster={posterReady ? site.storyVideo.poster : undefined} ratio="landscape" label="The story of Cygnus" story sizes="(min-width: 880px) 65vw, 100vw" />
+            </Pixelate>
             <span className="reel__label">
               <span className="reel__play" aria-hidden="true" />
               The story
@@ -77,7 +98,9 @@ export default function HomePage() {
           <div className="band">
             <Reveal className="band__media band__media--left" data-tilt="">
               <div className="band__frame" data-cursor="Discover">
-                <Clip src="/media/making-01.mp4" ratio="landscape" label="The making, I" />
+                <Pixelate>
+                  <Clip src="/media/making-01.mp4" ratio="landscape" label="The making, I" />
+                </Pixelate>
               </div>
             </Reveal>
             <div className="band__text band__text--right">
@@ -91,7 +114,9 @@ export default function HomePage() {
           <div className="band band--reverse">
             <Reveal className="band__media band__media--right" data-tilt="">
               <div className="band__frame" data-cursor="Discover">
-                <Clip src="/media/making-02.mp4" ratio="portrait" label="The making, II" />
+                <Pixelate>
+                  <Clip src="/media/making-02.mp4" ratio="portrait" label="The making, II" />
+                </Pixelate>
               </div>
             </Reveal>
             <div className="band__text band__text--left">
@@ -116,13 +141,15 @@ export default function HomePage() {
               <Drift key={p.slug} speed={[0.06, 0.16, 0.1][i]} className={`teaser__frame teaser__frame--${i + 1}`}>
                 <Reveal delay={i * 0.12} data-tilt="">
                   <Link href={`/sanctuary/pieces/${p.slug}`} className="tile tile--bare" data-cursor="Discover">
-                    <Picture
-                      src={p.images[0].src}
-                      alt={p.images[0].alt}
-                      ratio="portrait"
-                      sizes="(min-width: 880px) 28vw, 70vw"
-                      label={p.name}
-                    />
+                    <Pixelate>
+                      <Picture
+                        src={p.images[0].src}
+                        alt={p.images[0].alt}
+                        ratio="portrait"
+                        sizes="(min-width: 880px) 28vw, 70vw"
+                        label={p.name}
+                      />
+                    </Pixelate>
                   </Link>
                 </Reveal>
               </Drift>
@@ -143,18 +170,22 @@ export default function HomePage() {
           <div className="bespoke__grid">
             <Reveal className="bespoke__video" data-tilt="">
               <div className="band__frame" data-cursor="Discover">
-                <Clip src="/media/atelier.mp4" ratio="landscape" label="The atelier" />
+                <Pixelate>
+                  <Clip src="/media/atelier.mp4" ratio="landscape" label="The atelier" />
+                </Pixelate>
               </div>
             </Reveal>
             <Reveal className="bespoke__picture" delay={0.15} data-tilt="">
               <div className="band__frame">
-                <Picture
-                  src="/images/cygnature/hands.jpg"
-                  alt="A Cygnus commission in the making"
-                  ratio="tall"
-                  sizes="(min-width: 880px) 24vw, 60vw"
-                  label="Presence"
-                />
+                <Pixelate>
+                  <Picture
+                    src="/images/cygnature/hands.jpg"
+                    alt="A Cygnus commission in the making"
+                    ratio="tall"
+                    sizes="(min-width: 880px) 24vw, 60vw"
+                    label="Presence"
+                  />
+                </Pixelate>
               </div>
             </Reveal>
             <div className="bespoke__text">
@@ -176,6 +207,7 @@ export default function HomePage() {
       </section>
 
       <ScrollTilt />
+      <ReliefWall reliefs={reliefs} />
 
       <Link href="/sanctuary" className="see-all" aria-label="Enter the Sanctuary">
         {["Enter", "the", "Sanctuary"].map((w, i, all) => (

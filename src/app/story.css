@@ -24,7 +24,7 @@
 
 .room__head {
   padding: 8px;
-  color: var(--c-ink);
+  color: var(--c-slate);
   text-align: center;
 }
 
@@ -52,6 +52,7 @@
 }
 
 .wordmark--chapter {
+  color: var(--c-gold);
   font-size: clamp(1.8rem, 0.6rem + 3.6vw, 4.6rem);
   letter-spacing: 0.3em;
   margin-right: -0.3em;
@@ -71,8 +72,8 @@
   margin: 0;
   padding: 0 10px 0 12px;
   border-radius: 13px;
-  background: var(--c-charcoal);
-  color: var(--c-soft-white);
+  background: var(--c-slate);
+  color: var(--c-gold-light);
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 11px;
@@ -89,23 +90,27 @@
   clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
 }
 
-/* The copy of the header seen through the arches: light on the darkened film. */
-.room__head--arch {
-  color: var(--c-warm-beige);
+/* The copy of the header seen through the arches: light gold on the darkened film. */
+.room__head--arch,
+.room__head--arch .wordmark--chapter {
+  color: var(--c-gold-light);
 }
 
 .room__head--arch .room__tag {
-  background: var(--c-warm-beige);
-  color: var(--c-charcoal);
+  background: var(--c-gold-light);
+  color: var(--c-slate);
 }
 
 /* ---------- Room: title ---------- */
 
+/* The reference's gold roundhand (Edwardian Script there, Pinyon Script here),
+   in the same gold on the stone and on the film. Decorative: the room's name
+   is also a heading for assistive technology. */
 .room__title {
-  font-family: var(--font-display);
-  font-style: italic;
+  font-family: var(--font-script);
+  font-style: normal;
   font-weight: 400;
-  color: var(--c-ink);
+  color: var(--c-gold);
   pointer-events: none;
 }
 
@@ -132,7 +137,7 @@
 }
 
 .room__title--clip {
-  color: var(--c-soft-white);
+  color: var(--c-gold);
 }
 
 /* ---------- Room: panels ---------- */
@@ -227,7 +232,7 @@
   color: var(--c-soft-white);
 }
 
-/* ---------- Resting layout (touch, narrow, reduced motion, no JS) ---------- */
+/* ---------- Resting layout (touch, narrow screens, no JS) ---------- */
 
 .story:not(.is-engine) .room {
   padding-bottom: var(--space-section);
@@ -575,8 +580,8 @@
   justify-content: center;
   gap: 8vh;
   padding: 120px 8px;
-  background: var(--c-charcoal);
-  color: var(--c-warm-beige);
+  background: var(--c-slate);
+  color: var(--c-gold-light);
   clip-path: inset(100% 0 0);
   transition: clip-path 0.6s var(--story-ease);
 }
@@ -596,7 +601,7 @@
   padding: 4px;
   border: 0;
   background: var(--c-warm-beige);
-  color: var(--c-charcoal);
+  color: var(--c-slate);
   cursor: pointer;
   pointer-events: auto;
   transform: translate(-50%, calc(100% + 16px));
@@ -626,8 +631,8 @@
 }
 
 .storynav__toggle--inverted {
-  background: var(--c-charcoal);
-  color: var(--c-warm-beige);
+  background: var(--c-slate);
+  color: var(--c-gold-light);
 }
 
 .storynav__inner {
@@ -702,16 +707,16 @@
 }
 
 .storynav__brand .wordmark {
-  color: var(--c-warm-beige);
+  color: var(--c-gold);
   font-size: clamp(1.6rem, 1rem + 1.6vw, 2.6rem);
 }
 
 .storynav__tagline {
-  margin: 10px 0 0;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: clamp(1.1rem, 0.9rem + 0.6vw, 1.5rem);
-  color: var(--c-warm-beige);
+  margin: 6px 0 0;
+  font-family: var(--font-script);
+  font-size: clamp(1.6rem, 1.1rem + 1.1vw, 2.4rem);
+  line-height: 1.2;
+  color: var(--c-gold-light);
 }
 
 .storynav__list {
@@ -732,7 +737,7 @@
   display: grid;
   gap: 6px;
   padding: 2px 0;
-  color: var(--c-warm-beige);
+  color: var(--c-gold-light);
   text-decoration: none;
   opacity: 0.55;
 }
@@ -771,7 +776,7 @@
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--c-warm-beige);
+  color: var(--c-gold-light);
   text-decoration: none;
   opacity: 0.7;
 }
@@ -798,7 +803,7 @@
   width: 11px;
   height: 11px;
   margin-top: -5.5px;
-  background: var(--c-warm-beige);
+  background: var(--c-gold-light);
   clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
 }
 
@@ -824,7 +829,7 @@ html.story-nav-open {
   width: 4px;
   height: 48px;
   border-radius: 1px;
-  background: var(--c-charcoal);
+  background: var(--c-slate);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.6s;

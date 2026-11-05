@@ -6,7 +6,7 @@ import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 /**
  * The Sanctuary's gallery band: a row of mood images that drifts sideways as
  * the band crosses the viewport, like paintings passed in a corridor.
- * Static under reduced motion; scrolls natively on touch.
+ * Scrolls natively on touch.
  */
 export function GalleryDrift({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
