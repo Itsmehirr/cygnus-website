@@ -63,8 +63,11 @@ export function Pixelate({ children, className }: { children: React.ReactNode; c
       const sy = (sh - ch) / 2;
       const tw = Math.max(1, Math.round(W / block));
       const th = Math.max(1, Math.round(H / block));
-      tiny.width = tw;
-      tiny.height = th;
+      // Resizing a canvas reallocates it: only when the block size changes.
+      if (tiny.width !== tw || tiny.height !== th) {
+        tiny.width = tw;
+        tiny.height = th;
+      }
       tctx.imageSmoothingEnabled = true;
       tctx.drawImage(media, sx, sy, cw, ch, 0, 0, tw, th);
       ctx.imageSmoothingEnabled = false;
@@ -97,11 +100,16 @@ export function Pixelate({ children, className }: { children: React.ReactNode; c
     const reveal = () => {
       if (shown) return;
       shown = true;
+      // Pictures are decoded off the main thread first, so the mosaic's first
+      // frame never waits on a synchronous decode.
+      const go = () => {
+        if (media instanceof HTMLImageElement) media.decode().then(() => run(0, 1.1), () => run(0, 1.1));
+        else run(0, 1.1);
+      };
       if (ready(media)) {
-        run(0, 1.1);
+        go();
         return;
       }
-      const go = () => run(0, 1.1);
       media.addEventListener(media instanceof HTMLVideoElement ? "loadeddata" : "load", go, { once: true });
       // If the file is slow, show it rather than keep an empty frame.
       window.setTimeout(() => {

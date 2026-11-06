@@ -742,28 +742,6 @@ html:not(.is-ready):has(.hero) .sound {
   overflow: hidden;
 }
 
-.menu__relief {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  animation: relief-in 1400ms var(--ease) both;
-}
-
-.menu__relief canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-@keyframes relief-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 /* The type must stay legible over the lit relief. */
 .menu__nav,
 .menu__top,
@@ -1401,6 +1379,12 @@ html:not(.is-intro):not(.is-ready) .hero__count {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* Media that lean with the scroll speed keep their own layer, so a tilt
+   starting never has to re-raster them mid-scroll. */
+[data-tilt] > * {
+  will-change: transform;
 }
 
 /* ---------- Pixel transition (Immersive Garden's mosaic) ---------- */

@@ -1,15 +1,15 @@
 "use client";
 
-import { createContext, useContext, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
-type LenisRef = React.MutableRefObject<Lenis | null>;
-const LenisContext = createContext<LenisRef | null>(null);
+const LenisContext = createContext<Lenis | null>(null);
 
-/** The live Lenis instance (null before mount). */
-export const useLenis = () => useContext(LenisContext)?.current ?? null;
+/** The live Lenis instance: null on the first render, then the instance (the
+ *  component re-renders when it arrives, so effects keyed on it run). */
+export const useLenis = () => useContext(LenisContext);
 
 /**
  * Mounts one Lenis instance for the whole app and feeds its scroll position to
@@ -19,6 +19,7 @@ export const useLenis = () => useContext(LenisContext)?.current ?? null;
  */
 export function ScrollProvider({ children }: { children: ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
+  const [lenis, setLenis] = useState<Lenis | null>(null);
   const pathname = usePathname();
   const firstPath = useRef(pathname);
 
@@ -40,11 +41,16 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
     lenisRef.current = instance;
+    // Hand the instance to consumers on the next frame (they mounted before it
+    // existed and re-render when it arrives).
+    const handoff = window.requestAnimationFrame(() => setLenis(instance));
 
     return () => {
+      window.cancelAnimationFrame(handoff);
       gsap.ticker.remove(tick);
       instance.destroy();
       lenisRef.current = null;
+      setLenis(null);
     };
   }, []);
 
@@ -89,5 +95,5 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(id);
   }, [pathname]);
 
-  return <LenisContext.Provider value={lenisRef}>{children}</LenisContext.Provider>;
+  return <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>;
 }

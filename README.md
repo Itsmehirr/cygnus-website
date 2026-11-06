@@ -1,6 +1,6 @@
 # Cygnus — website
 
-The site of Cygnus, a contemporary high jewellery house working in grown carbon (founded 2003). Next.js 16 (App Router, TypeScript), plain CSS, self-hosted fonts, Lenis + GSAP for the scroll grammar, raw WebGL for the Home wall and three.js for the Menu. There is no CMS yet: content lives in typed files under `src/content`.
+The site of Cygnus, a contemporary high jewellery house working in grown carbon (founded 2003). Next.js 16 (App Router, TypeScript), plain CSS, self-hosted fonts, Lenis + GSAP for the scroll grammar, and one raw WebGL relief wall for Home (light stone) and the Menu (dark stone). There is no CMS yet: content lives in typed files under `src/content`.
 
 - Live: https://cygnus-website-eight.vercel.app (Vercel deploys every push to `main`).
 - The build plan, the two reference deconstructions and the open questions for the house live in the Claude Doc **Cygnus Website — Build Plan**.
@@ -26,15 +26,15 @@ src/app
     sanctuary/          the Sanctuary story (collections as rooms), by category, by collection, piece pages → enquiry
     cygnature/          bespoke: film, picture, text → registration → a note from the house
     info/               facts, questions answered, write to us
-  menu/                 the Menu ("The House"): charcoal page, WebGL relief, pointer light
+  menu/                 the Menu ("The House"): the reliefs carved in charcoal, lit by the cursor
   actions.ts            server actions: enquiry and registration (honeypot, validation, mail)
   sitemap.ts robots.ts llms.txt/   SEO / AEO / GEO surface
   globals.css story.css            design system, Home grammar, Sanctuary grammar
 src/components
-  home/                 Hero (opening), ReliefWall (the sculpted wall)
+  home/                 Hero (opening), ReliefWall (the sculpted wall, Home and Menu)
   motion/               ScrollProvider (Lenis), Reveal, Paragraph + Dissolve, Pixelate, ScrollTilt, InkTransition, FooterMotion
   sanctuary/            Story (room engine), StoryNav, Hotspot, ScrollThumb, GalleryDrift
-  chrome/               Cursor, Menu relief and light, sound
+  chrome/               Cursor, Menu ground (dark relief wall; CSS light without WebGL), sound
 src/content             site facts, nav, home copy, collections, pieces, FAQ
 src/lib                 gsap registration, schema builders, metadata helper, mail adapter
 scripts/                stone-texture.py (the ground), relief.py (wall maps)
@@ -48,7 +48,8 @@ public/textures         the stone ground
 The site runs full motion for every visitor; like both references, it does not read the system "Reduce motion" setting.
 
 - **Home, after immersive-g.com.** The opening builds the axis in place (wordmark mask sweep, the line word by word, a counter that hands over to "Scroll"), then the chrome fades in. Paragraphs reveal line by line; statements dissolve in letter by letter; films and pictures arrive through a pixel mosaic (`Pixelate`); media lean with scroll speed (`ScrollTilt`). Lenis lerp 0.05. The cursor keeps the system pointer with three trailing dots and words from `data-cursor`. The Menu opens with an ink spreading from its corner.
-- **The sculpted wall.** `ReliefWall` draws plaster motifs onto the stone as shading only, one fixed WebGL layer under the page. Each relief belongs to a section (placements in `src/app/(site)/page.tsx`), rises out of the ground as that section nears the centre, trails the page and sinks back as it leaves. It starts only after the opening, when the browser is idle, and uploads its maps one per frame.
+- **The sculpted wall.** `ReliefWall` draws plaster motifs onto the stone as shading only, one fixed WebGL layer under the page. Each relief belongs to a section (placements in `src/app/(site)/page.tsx`), rises out of the ground as that section nears the centre, trails the page and sinks back as it leaves. A light follows the cursor across it (relighting the carving from its height map, with a glint on the forms that face it) and the reliefs lean slightly towards it; on touch screens the light wanders on its own. It starts only after the opening, when the browser is idle, and uploads its maps one per frame.
+- **The Menu** uses the same wall in its dark theme: the reliefs carved in the charcoal (placements in `src/components/chrome/MenuGround.tsx`), barely visible until the cursor's chartreuse-white light finds them, with a faint iridescence on the glints; the light wanders when nobody moves.
 - **Sanctuary, after collabcapitolium.fr.** Each collection is a pinned room: five round-topped arches onto one film, the centre arch opening to full screen, the gold script title rising and scrolling, panels travelling right to left on the diagonal, the room sliding away left. A framed pill opens the slate nav panel. Lenis 1.2 s expo on this route.
 
 ## Assets: where to drop them
@@ -62,7 +63,7 @@ A missing file falls back to a poster or tonal placeholder; adding the file need
 | Making films | `public/media/making-01.mp4`, `making-02.mp4` (+ `.jpg` posters) | 3:4 for the second |
 | Atelier film | `public/media/atelier.mp4` (+ `.jpg`) | Home and Cygnature |
 | Piece photography | `public/images/pieces/<slug>-01.jpg`, `-02.jpg` | listed per piece in `src/content/pieces.ts` |
-| Relief maps | `public/images/relief/<name>.webp` and `<name>-s.webp` (phones) | grey shading maps, see below |
+| Relief maps | `public/images/relief/<name>.webp`, `<name>-h.webp` and their `-s` phone cuts | shading and height, see below |
 | Wordmark | `public/wordmark.svg` | replace the placeholder; keep the name |
 | OG image, favicon | `public/og.jpg`, `public/favicon.ico` | |
 
@@ -76,7 +77,7 @@ The wall draws grey shading maps where 128 is the flat wall, darker is shadow an
 python3 scripts/relief.py convert photo.png public/images/relief/swan-flight.webp 1280 560
 ```
 
-writes the desktop map and its phone cut (`swan-flight-s.webp`). Size each to its largest placement, about 21.6 px per vw of width on desktop and 6 px per vw on phones (the swan in flight spans 60 vw, so 1280 and 560). Keep an existing name to replace a relief, or add an entry to `reliefs` in `src/app/(site)/page.tsx`.
+writes the shading and height maps and their phone cuts (`swan-flight.webp`, `swan-flight-h.webp`, `swan-flight-s.webp`, `swan-flight-h-s.webp`). Size each to its largest placement, about 21.6 px per vw of width on desktop and 6 px per vw on phones (the swan in flight spans 60 vw, so 1280 and 560). Keep an existing name to replace a relief, or add an entry to `reliefs` in `src/app/(site)/page.tsx`.
 
 ### Fonts
 
@@ -97,7 +98,7 @@ Vercel Web Analytics and Speed Insights are mounted in the root layout. Both are
 
 ## Browser support
 
-Current Chrome, Edge, Safari (15.4+, iOS included) and Firefox. The intro's `:has()` rule degrades on Firefox before 121 (the chrome simply shows during the opening). Films autoplay muted; where a phone blocks autoplay (Low Power Mode) the posters stay. Without WebGL the wall and the Menu relief are simply absent.
+Current Chrome, Edge, Safari (15.4+, iOS included) and Firefox. The intro's `:has()` rule degrades on Firefox before 121 (the chrome simply shows during the opening). Films autoplay muted; where a phone blocks autoplay (Low Power Mode) the posters stay. Without WebGL the wall is absent and the Menu falls back to a CSS light that follows the pointer.
 
 ## Phases
 

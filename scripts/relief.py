@@ -11,9 +11,11 @@ Two ways to make a map:
       From an image of a relief on a flat wall (the Higgsfield stand-ins, or a
       real photograph later): the wall is estimated and removed, leaving the
       relief's shading, centred on 128. With two widths it writes the page's
-      pair: swan.webp at the first (desktop) and swan-s.webp at the second
-      (phones). Size each to its largest placement: about 21.6 px per vw of
-      width on desktop, 6 px per vw on phones.
+      set: swan.webp and swan-h.webp (shading and height) at the first width
+      (desktop), swan-s.webp and swan-h-s.webp at the second (phones). Size
+      each to its largest placement: about 21.6 px per vw of width on desktop,
+      6 px per vw on phones. The height lets the page relight the relief with
+      the cursor.
 
   python3 scripts/relief.py procedural public/images/relief
       Draws the house's own motifs (swan feathers, the Cygnus constellation,
@@ -319,7 +321,8 @@ def procedural(outdir):
 # Conversion of a lit image of a relief on a flat wall
 
 
-def convert(src, dst, max_w=1800):
+def wall_deviation(src, max_w=1800):
+    """Luminance minus the fitted wall, and a fade toward the frame's edges."""
     im = Image.open(src).convert("L")
     if im.width > max_w:
         im = im.resize((max_w, round(im.height * max_w / im.width)), Image.LANCZOS)
@@ -335,12 +338,54 @@ def convert(src, dst, max_w=1800):
     u, v = xx / w - 0.5, yy / h - 0.5
     A = np.stack([np.ones_like(u), u, v, u * u, v * v, u * v], -1)
     coef, *_ = np.linalg.lstsq(A[wall], L[wall], rcond=None)
-    surface = A @ coef
-    shade = L - surface
+    dev = L - A @ coef
     # Fade the frame so nothing can show a hard edge.
-    fade = np.minimum.reduce([xx, yy, w - 1 - xx, h - 1 - yy]) / (0.06 * min(w, h))
-    shade *= np.clip(fade, 0, 1) ** 1.5
-    save_map(shade, dst, gain=255.0 * 1.6)
+    fade = np.clip(np.minimum.reduce([xx, yy, w - 1 - xx, h - 1 - yy]) / (0.06 * min(w, h)), 0, 1) ** 1.5
+    return dev, fade
+
+
+def convert(src, dst, max_w=1800):
+    dev, fade = wall_deviation(src, max_w)
+    save_map(dev * fade, dst, gain=255.0 * 1.6)
+
+
+def height(src, max_w=1800):
+    """Relief height (0-1) from a lit image of a pale relief on a darker wall.
+
+    The lit plaster outlines the form: its silhouette is filled and inflated
+    with rounded edges, and the image's own fine shading adds the carving.
+    Cast shadows stay on the wall. The page relights the relief from this.
+    """
+    dev, fade = wall_deviation(src, max_w)
+    h, w = dev.shape
+    s = w / 1800.0
+    # A smooth silhouette: the lit plaster, softened before and after closing,
+    # so the outline carries no ragged steps for the light to catch.
+    lit = ndi.gaussian_filter(dev, 3.0 * s) > 0.01
+    r = max(2, round(9 * s))
+    yy, xx = np.ogrid[-r : r + 1, -r : r + 1]
+    disk = xx * xx + yy * yy <= r * r
+    sil = ndi.binary_fill_holes(ndi.binary_closing(lit, structure=disk))
+    lab, n = ndi.label(sil)
+    if n:
+        sizes = ndi.sum(sil, lab, range(1, n + 1))
+        sil = np.isin(lab, 1 + np.flatnonzero(sizes > 600 * s * s))
+    soft = ndi.gaussian_filter(sil.astype(np.float32), 5 * s)
+    # Inflate it gently (rounded shoulders, a low dome), then add the carving.
+    dome = ndi.gaussian_filter(1 - np.exp(-ndi.distance_transform_edt(sil) / (40 * s)), 6 * s)
+    carving = ndi.gaussian_filter(dev, 1.2 * s) * soft
+    H = (0.45 * dome + 3.0 * carving) * fade
+    H = np.clip(ndi.gaussian_filter(H, 1.0 * s), 0, None)
+    return H / max(H.max(), 1e-6)
+
+
+def save_pair(arr, dst, w_desk, w_phone, gain=None):
+    """Write the desktop map and its -s phone cut from a float array."""
+    img = Image.fromarray(np.clip(arr * 255 if gain is None else 128 + arr * gain, 0, 255).astype(np.uint8), "L")
+    for w, out in [(w_desk, dst), (w_phone, dst[:-5] + "-s.webp")]:
+        cut = img.resize((w, round(img.height * w / img.width)), Image.LANCZOS)
+        cut.convert("RGB").save(out, "WEBP", quality=88, method=6)
+        print(f"{out}  {cut.width}x{cut.height}  {os.path.getsize(out) // 1024} KB")
 
 
 if __name__ == "__main__":
@@ -348,15 +393,12 @@ if __name__ == "__main__":
         procedural(sys.argv[2])
     elif len(sys.argv) >= 4 and sys.argv[1] == "convert":
         if len(sys.argv) >= 6:
-            # Full-resolution map first, then the desktop and phone cuts.
-            full = sys.argv[3][:-5] + ".full.webp"
-            convert(sys.argv[2], full)
-            im = Image.open(full).convert("L")
-            for w, out in [(int(sys.argv[4]), sys.argv[3]), (int(sys.argv[5]), sys.argv[3][:-5] + "-s.webp")]:
-                cut = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
-                cut.convert("RGB").save(out, "WEBP", quality=88, method=6)
-                print(f"{out}  {cut.width}x{cut.height}  {os.path.getsize(out) // 1024} KB")
-            os.remove(full)
+            # The page's set: shading (name.webp, name-s.webp) and height
+            # (name-h.webp, name-h-s.webp), at the desktop and phone widths.
+            dev, fade = wall_deviation(sys.argv[2])
+            w_desk, w_phone = int(sys.argv[4]), int(sys.argv[5])
+            save_pair(dev * fade, sys.argv[3], w_desk, w_phone, gain=255.0 * 1.6)
+            save_pair(height(sys.argv[2]), sys.argv[3][:-5] + "-h.webp", w_desk, w_phone)
         else:
             convert(sys.argv[2], sys.argv[3])
     else:
