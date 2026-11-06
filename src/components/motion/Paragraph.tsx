@@ -30,19 +30,22 @@ export function Paragraph({
     const el = ref.current;
     if (!el) return;
     const s = state.current;
-    s.split = SplitText.create(el, { type: "lines", linesClass: "para__line" });
-    gsap.set(s.split.lines, { autoAlpha: 0 });
+    // aria "none": the lines keep their words, so the paragraph reads as written
+    // (an aria-label is not allowed on a <p>). Lines fade by opacity only, never
+    // visibility, so the words stay readable to assistive technology while hidden.
+    s.split = SplitText.create(el, { type: "lines", linesClass: "para__line", aria: "none" });
+    gsap.set(s.split.lines, { opacity: 0 });
     const enter = () => {
       if (s.tl) return;
       s.tl = gsap.timeline();
       s.tl.fromTo(el, { y: 50 }, { y: 0, duration: 2, ease: "power2.out" }, 0);
-      s.tl.fromTo(s.split!.lines, { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.8, ease: "power1.out", stagger: 0.1 }, 0);
+      s.tl.fromTo(s.split!.lines, { opacity: 0 }, { opacity: 1, duration: 1.8, ease: "power1.out", stagger: 0.1 }, 0);
     };
     const reset = () => {
       s.tl?.kill();
       s.tl = null;
       gsap.set(el, { y: 0 });
-      gsap.set(s.split!.lines, { autoAlpha: 0 });
+      gsap.set(s.split!.lines, { opacity: 0 });
     };
     const io = new IntersectionObserver(
       ([e]) => {
@@ -127,7 +130,8 @@ export function Dissolve({
 
   const words = text.split(" ");
   return (
-    <Tag ref={ref} className={`dissolve ${className ?? ""}`.trim()} id={id} aria-label={text}>
+    <Tag ref={ref} className={`dissolve ${className ?? ""}`.trim()} id={id}>
+      <span className="sr-only">{text}</span>
       {words.map((w, i) => (
         <span key={i} className="dissolve__w" aria-hidden="true">
           {Array.from(w).map((c, k) => (

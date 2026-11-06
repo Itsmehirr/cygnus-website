@@ -475,7 +475,7 @@ function Room({ chapter, index, total }: { chapter: StoryChapter; index: number;
               <div key={i} className={`room__item room__item--${it.align}`}>
                 <div className="room__media" style={{ aspectRatio: `${it.image.w} / ${it.image.h}` }}>
                   {it.href && it.hotspot ? (
-                    <Hotspot href={it.href} label1={it.hotspot[0]} label2={it.hotspot[1]}>
+                    <Hotspot href={it.href} label1={it.hotspot[0]} label2={it.hotspot[1]} name={it.image.alt}>
                       <Image src={it.image.src} alt={it.image.alt} fill sizes="(min-width: 880px) 34vw, 90vw" />
                     </Hotspot>
                   ) : (

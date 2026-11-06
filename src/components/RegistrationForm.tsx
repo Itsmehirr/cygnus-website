@@ -1,12 +1,17 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { track } from "@vercel/analytics";
 import { submitRegistration, type FormState } from "@/app/actions";
 
 const initial: FormState = { status: "idle" };
 
 export function RegistrationForm() {
   const [state, action, pending] = useActionState(submitRegistration, initial);
+
+  useEffect(() => {
+    if (state.status === "success") track("Cygnature registration");
+  }, [state.status]);
 
   if (state.status === "success") {
     return (

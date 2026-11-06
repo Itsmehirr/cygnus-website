@@ -7,10 +7,13 @@ shading onto the stone ground, so the motifs look carved out of the same stone.
 
 Two ways to make a map:
 
-  python3 scripts/relief.py convert photo.png out.webp
+  python3 scripts/relief.py convert photo.png public/images/relief/swan.webp [1280 560]
       From an image of a relief on a flat wall (the Higgsfield stand-ins, or a
       real photograph later): the wall is estimated and removed, leaving the
-      relief's shading, centred on 128.
+      relief's shading, centred on 128. With two widths it writes the page's
+      pair: swan.webp at the first (desktop) and swan-s.webp at the second
+      (phones). Size each to its largest placement: about 21.6 px per vw of
+      width on desktop, 6 px per vw on phones.
 
   python3 scripts/relief.py procedural public/images/relief
       Draws the house's own motifs (swan feathers, the Cygnus constellation,
@@ -344,7 +347,18 @@ if __name__ == "__main__":
     if len(sys.argv) >= 3 and sys.argv[1] == "procedural":
         procedural(sys.argv[2])
     elif len(sys.argv) >= 4 and sys.argv[1] == "convert":
-        convert(sys.argv[2], sys.argv[3])
+        if len(sys.argv) >= 6:
+            # Full-resolution map first, then the desktop and phone cuts.
+            full = sys.argv[3][:-5] + ".full.webp"
+            convert(sys.argv[2], full)
+            im = Image.open(full).convert("L")
+            for w, out in [(int(sys.argv[4]), sys.argv[3]), (int(sys.argv[5]), sys.argv[3][:-5] + "-s.webp")]:
+                cut = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
+                cut.convert("RGB").save(out, "WEBP", quality=88, method=6)
+                print(f"{out}  {cut.width}x{cut.height}  {os.path.getsize(out) // 1024} KB")
+            os.remove(full)
+        else:
+            convert(sys.argv[2], sys.argv[3])
     else:
         print(__doc__)
         sys.exit(1)

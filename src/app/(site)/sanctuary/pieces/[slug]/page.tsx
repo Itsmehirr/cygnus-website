@@ -91,7 +91,7 @@ export default async function PiecePage({ params }: { params: Promise<Params> })
             </div>
           </div>
 
-          <aside className="piece__aside">
+          <div className="piece__aside">
             <div className="piece__sticky">
               <Breadcrumbs
                 items={[
@@ -150,7 +150,7 @@ export default async function PiecePage({ params }: { params: Promise<Params> })
                 <p className="small muted">{careNote}</p>
               </div>
             </div>
-          </aside>
+          </div>
         </div>
       </article>
 

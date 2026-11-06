@@ -94,150 +94,239 @@ export function ReliefWall({ reliefs }: { reliefs: Relief[] }) {
   useEffect(() => {
     const host = root.current;
     if (!host) return;
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false });
-    if (!gl) return;
-    host.appendChild(canvas);
-
-    const compile = (type: number, src: string) => {
-      const s = gl.createShader(type)!;
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      return s;
-    };
-    const prog = gl.createProgram()!;
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-      canvas.remove();
-      return;
-    }
-    gl.useProgram(prog);
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]), gl.STATIC_DRAW);
-    const aPos = gl.getAttribLocation(prog, "a_pos");
-    gl.enableVertexAttribArray(aPos);
-    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-    const u = (name: string) => gl.getUniformLocation(prog, name);
-    const uRes = u("u_res"), uCenter = u("u_center"), uSize = u("u_size"), uRot = u("u_rot"), uFlip = u("u_flip"), uRise = u("u_rise"), uAmount = u("u_amount"), uSeed = u("u_seed");
-    gl.uniform1i(u("u_tex"), 0);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.clearColor(0, 0, 0, 0);
-
-    // One texture per map, shared by every relief that uses it.
-    const textures = new Map<string, WebGLTexture | null>();
-    let disposed = false;
-    for (const src of new Set(reliefs.map((r) => r.src))) {
-      textures.set(src, null);
-      const img = new Image();
-      img.decoding = "async";
-      (img as HTMLImageElement & { fetchPriority?: string }).fetchPriority = "low";
-      img.src = src;
-      img
-        .decode()
-        .then(() => {
-          if (disposed) return;
-          const tex = gl.createTexture();
-          gl.bindTexture(gl.TEXTURE_2D, tex);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, gl.LUMINANCE, gl.UNSIGNED_BYTE, img);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-          textures.set(src, tex);
-          dirty = true;
-        })
-        .catch(() => {});
-    }
-
-    const items = reliefs.map((r) => ({ ...r, el: document.querySelector<HTMLElement>(r.anchor), rise: 0 }));
     const html = document.documentElement;
-    let global = 0;
-    let dirty = true;
-    let lastY = -1;
-    let w = 0;
-    let h = 0;
-    let raf = 0;
-    let last = performance.now();
+    let stop: (() => void) | undefined;
+    let cancelled = false;
+    let pending: (() => void) | undefined;
 
-    const frame = (now: number) => {
-      raf = requestAnimationFrame(frame);
-      const dt = Math.min(0.1, (now - last) / 1000);
-      last = now;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      if (vw !== w || vh !== h) {
-        w = vw;
-        h = vh;
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-        canvas.width = Math.round(vw * dpr);
-        canvas.height = Math.round(vh * dpr);
-        gl.viewport(0, 0, canvas.width, canvas.height);
-        dirty = true;
+    // Nothing is set up until the opening has finished and the browser is idle,
+    // so the wall costs the first load nothing.
+    const later = (fn: () => void) => {
+      if (typeof window.requestIdleCallback === "function") {
+        const id = window.requestIdleCallback(fn, { timeout: 1200 });
+        return () => window.cancelIdleCallback(id);
       }
-      if (window.scrollY !== lastY) {
-        lastY = window.scrollY;
-        dirty = true;
+      // Safari before 18 has no idle callback.
+      const id = setTimeout(fn, 150);
+      return () => clearTimeout(id);
+    };
+    const begin = () => {
+      if (stop || pending || cancelled) return;
+      pending = later(() => {
+        pending = undefined;
+        if (!cancelled) stop = start(host);
+      });
+    };
+    const mo = new MutationObserver(() => {
+      if (html.classList.contains("is-ready")) begin();
+    });
+    if (html.classList.contains("is-ready")) begin();
+    else mo.observe(html, { attributes: true, attributeFilter: ["class"] });
+
+    function start(host: HTMLDivElement): (() => void) | undefined {
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false });
+      if (!gl) return;
+      host.appendChild(canvas);
+
+      const compile = (type: number, src: string) => {
+        const s = gl.createShader(type)!;
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return s;
+      };
+      const prog = gl.createProgram()!;
+      gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+        canvas.remove();
+        return;
       }
-      // The wall waits for the opening, then comes up over 1.6 s.
-      const g = html.classList.contains("is-ready") ? 1 : 0;
-      if (global !== g) {
-        global = g > global ? Math.min(1, global + dt / 1.6) : 0;
+      gl.useProgram(prog);
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]), gl.STATIC_DRAW);
+      const aPos = gl.getAttribLocation(prog, "a_pos");
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+      const u = (name: string) => gl.getUniformLocation(prog, name);
+      const uRes = u("u_res"), uCenter = u("u_center"), uSize = u("u_size"), uRot = u("u_rot"), uFlip = u("u_flip"), uRise = u("u_rise"), uAmount = u("u_amount"), uSeed = u("u_seed");
+      gl.uniform1i(u("u_tex"), 0);
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+      gl.clearColor(0, 0, 0, 0);
+
+      // One texture per map, shared by every relief that uses it; phones take
+      // a smaller cut. Pictures decode off the main thread, then go to the GPU
+      // one per frame, in the order they appear down the page, so no single
+      // moment carries all the uploads.
+      const small = window.innerWidth < 720;
+      const variant = (src: string) => (small ? src.replace(/\.webp$/, "-s.webp") : src);
+      const textures = new Map<string, WebGLTexture | null>();
+      const queue: { src: string; img: HTMLImageElement }[] = [];
+      let disposed = false;
+      let uploading = 0;
+      const upload = () => {
+        uploading = 0;
+        const next = queue.shift();
+        if (!next || disposed) return;
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        // RGBA keeps Chrome on its fast upload path (no per-pixel conversion).
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, next.img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        textures.set(next.src, tex);
         dirty = true;
+        if (queue.length) uploading = requestAnimationFrame(upload);
+      };
+      const order = [...new Set(reliefs.map((r) => r.src))];
+      const decoded = new Map<string, HTMLImageElement | null>();
+      let nextIndex = 0;
+      // Queue maps in page order as soon as everything before them is in;
+      // a map that fails to load is skipped.
+      const advance = () => {
+        while (nextIndex < order.length && decoded.has(order[nextIndex])) {
+          const img = decoded.get(order[nextIndex]);
+          if (img) queue.push({ src: order[nextIndex], img });
+          nextIndex++;
+        }
+        if (queue.length && !uploading) uploading = requestAnimationFrame(upload);
+      };
+      for (const src of order) {
+        textures.set(src, null);
+        const img = new Image();
+        img.decoding = "async";
+        (img as HTMLImageElement & { fetchPriority?: string }).fetchPriority = "low";
+        img.src = variant(src);
+        img
+          .decode()
+          .then(() => {
+            if (disposed) return;
+            decoded.set(src, img);
+            advance();
+          })
+          .catch(() => {
+            if (disposed) return;
+            decoded.set(src, null);
+            advance();
+          });
       }
-      const ease = 1 - Math.exp(-dt * 2.2);
-      const placed: { it: (typeof items)[number]; cx: number; cy: number; sw: number; sh: number }[] = [];
-      for (const it of items) {
-        if (!it.el) continue;
-        const r = it.el.getBoundingClientRect();
-        const centre = r.top + r.height / 2;
-        const small = vw < 720;
-        const ph = small ? it.phone : undefined;
-        const sw = (vw * (ph?.w ?? it.w * (small ? 1.7 : 1))) / 100;
-        const sh = sw / it.aspect;
-        const cx = (vw * (ph?.x ?? it.x)) / 100;
-        const cy = centre + (vh * (ph?.y ?? it.y)) / 100 - (centre - vh / 2) * it.depth;
-        // Rises as its section nears the centre, sinks back as it leaves.
-        const dist = Math.abs(centre - vh / 2) / (vh / 2 + r.height / 2);
-        const target = 1 - smooth(0.38, 0.95, dist);
-        if (Math.abs(target - it.rise) > 0.001) {
-          it.rise += (target - it.rise) * ease;
+
+      // Sections are measured once (and again whenever the page's size changes),
+      // never per frame, so drawing the wall forces no layout while scrolling.
+      const items = reliefs.map((r) => ({ ...r, el: document.querySelector<HTMLElement>(r.anchor), rise: 0, top: 0, h: 0 }));
+      const html = document.documentElement;
+      const measure = () => {
+        const y = window.scrollY;
+        for (const it of items) {
+          if (!it.el) continue;
+          const r = it.el.getBoundingClientRect();
+          it.top = r.top + y;
+          it.h = r.height;
+        }
+        dirty = true;
+      };
+      const ro = new ResizeObserver(measure);
+      ro.observe(document.body);
+      window.addEventListener("load", measure);
+      let global = 0;
+      let dirty = true;
+      measure();
+      let lastY = -1;
+      let w = 0;
+      let h = 0;
+      let raf = 0;
+      let last = performance.now();
+
+      const frame = (now: number) => {
+        raf = requestAnimationFrame(frame);
+        const dt = Math.min(0.1, (now - last) / 1000);
+        last = now;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        if (vw !== w || vh !== h) {
+          w = vw;
+          h = vh;
+          const dpr = Math.min(window.devicePixelRatio || 1, vw < 720 ? 1.25 : 1.5);
+          canvas.width = Math.round(vw * dpr);
+          canvas.height = Math.round(vh * dpr);
+          gl.viewport(0, 0, canvas.width, canvas.height);
           dirty = true;
         }
-        if (cy + sh / 2 < -60 || cy - sh / 2 > vh + 60) continue;
-        placed.push({ it, cx, cy, sw, sh });
-      }
-      if (!dirty) return;
-      dirty = false;
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.uniform2f(uRes, vw, vh);
-      for (const { it, cx, cy, sw, sh } of placed) {
-        const rise = it.rise * global;
-        const tex = textures.get(it.src);
-        if (!tex || rise < 0.004) continue;
-        // A little growth as it rises, as if pushed through from behind.
-        const grow = 0.94 + 0.06 * rise;
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.uniform2f(uCenter, cx, cy);
-        gl.uniform2f(uSize, sw * grow, sh * grow);
-        gl.uniform1f(uRot, ((it.rot ?? 0) * Math.PI) / 180);
-        gl.uniform1f(uFlip, it.flip ? 1 : 0);
-        gl.uniform1f(uRise, rise);
-        gl.uniform1f(uAmount, it.amount ?? 1);
-        gl.uniform1f(uSeed, it.seed);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      }
-    };
-    raf = requestAnimationFrame(frame);
+        if (window.scrollY !== lastY) {
+          lastY = window.scrollY;
+          dirty = true;
+        }
+        // The wall waits for the opening, then comes up over 1.6 s.
+        const g = html.classList.contains("is-ready") ? 1 : 0;
+        if (global !== g) {
+          global = g > global ? Math.min(1, global + dt / 1.6) : 0;
+          dirty = true;
+        }
+        const ease = 1 - Math.exp(-dt * 2.2);
+        const placed: { it: (typeof items)[number]; cx: number; cy: number; sw: number; sh: number }[] = [];
+        for (const it of items) {
+          if (!it.el) continue;
+          const top = it.top - lastY;
+          const centre = top + it.h / 2;
+          const small = vw < 720;
+          const ph = small ? it.phone : undefined;
+          const sw = (vw * (ph?.w ?? it.w * (small ? 1.7 : 1))) / 100;
+          const sh = sw / it.aspect;
+          const cx = (vw * (ph?.x ?? it.x)) / 100;
+          const cy = centre + (vh * (ph?.y ?? it.y)) / 100 - (centre - vh / 2) * it.depth;
+          // Rises as its section nears the centre, sinks back as it leaves.
+          const dist = Math.abs(centre - vh / 2) / (vh / 2 + it.h / 2);
+          const target = 1 - smooth(0.38, 0.95, dist);
+          if (Math.abs(target - it.rise) > 0.001) {
+            it.rise += (target - it.rise) * ease;
+            dirty = true;
+          }
+          if (cy + sh / 2 < -60 || cy - sh / 2 > vh + 60) continue;
+          placed.push({ it, cx, cy, sw, sh });
+        }
+        if (!dirty) return;
+        dirty = false;
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.uniform2f(uRes, vw, vh);
+        for (const { it, cx, cy, sw, sh } of placed) {
+          const rise = it.rise * global;
+          const tex = textures.get(it.src);
+          if (!tex || rise < 0.004) continue;
+          // A little growth as it rises, as if pushed through from behind.
+          const grow = 0.94 + 0.06 * rise;
+          gl.bindTexture(gl.TEXTURE_2D, tex);
+          gl.uniform2f(uCenter, cx, cy);
+          gl.uniform2f(uSize, sw * grow, sh * grow);
+          gl.uniform1f(uRot, ((it.rot ?? 0) * Math.PI) / 180);
+          gl.uniform1f(uFlip, it.flip ? 1 : 0);
+          gl.uniform1f(uRise, rise);
+          gl.uniform1f(uAmount, it.amount ?? 1);
+          gl.uniform1f(uSeed, it.seed);
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        }
+      };
+      raf = requestAnimationFrame(frame);
+      return () => {
+        disposed = true;
+        cancelAnimationFrame(raf);
+        cancelAnimationFrame(uploading);
+        ro.disconnect();
+        window.removeEventListener("load", measure);
+        gl.getExtension("WEBGL_lose_context")?.loseContext();
+        canvas.remove();
+      };
+    }
 
     return () => {
-      disposed = true;
-      cancelAnimationFrame(raf);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
-      canvas.remove();
+      cancelled = true;
+      mo.disconnect();
+      pending?.();
+      stop?.();
     };
   }, [reliefs]);
 

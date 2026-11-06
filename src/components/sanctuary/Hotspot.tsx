@@ -14,11 +14,14 @@ export function Hotspot({
   href,
   label1,
   label2,
+  name,
   children,
 }: {
   href: string;
   label1: string;
   label2: string;
+  /** What it leads to, said after the visible words (the picture's alt text). */
+  name?: string;
   children: ReactNode;
 }) {
   const wrap = useRef<HTMLAnchorElement>(null);
@@ -84,7 +87,7 @@ export function Hotspot({
   };
 
   return (
-    <Link ref={wrap} href={href} className="hotspot" aria-label={`${label1} ${label2}`}>
+    <Link ref={wrap} href={href} className="hotspot" aria-label={`${label1} ${label2}${name ? `: ${name}` : ""}`}>
       {children}
       <span ref={btn} className="hotspot__btn" aria-hidden="true">
         <svg ref={svg} className="hotspot__svg" viewBox="0 0 100 100">

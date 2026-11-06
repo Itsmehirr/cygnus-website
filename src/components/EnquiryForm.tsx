@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { track } from "@vercel/analytics";
 import { submitEnquiry, type FormState } from "@/app/actions";
 
 const initial: FormState = { status: "idle" };
@@ -13,6 +14,11 @@ export function EnquiryForm({
   autoFocus?: boolean;
 }) {
   const [state, action, pending] = useActionState(submitEnquiry, initial);
+
+  // The site's one conversion: an enquiry reaching the house.
+  useEffect(() => {
+    if (state.status === "success") track("Enquiry", { piece: piece.slug });
+  }, [state.status, piece.slug]);
 
   if (state.status === "success") {
     return (

@@ -18,7 +18,9 @@ export function FooterMotion() {
     const inner = footer.querySelector<HTMLElement>(".container");
     const parts = Array.from(footer.querySelectorAll<HTMLElement>(".wordmark, .footer__col"));
     let tl: gsap.core.Timeline | null = null;
-    if (inner) gsap.set(parts, { autoAlpha: 0 });
+    // Opacity only, so the footer's links stay reachable by keyboard and screen
+    // reader before it has scrolled into view.
+    if (inner) gsap.set(parts, { opacity: 0 });
     const io = new IntersectionObserver(
       ([e]) => {
         html.classList.toggle("footer-in", e.isIntersecting);
@@ -27,14 +29,14 @@ export function FooterMotion() {
           tl = gsap.timeline();
           tl.fromTo(inner, { y: 60 }, { y: 0, duration: 2.8, ease: "expo.out" }, 0.3).to(
             parts,
-            { autoAlpha: 1, duration: 1.5, ease: "sine.inOut", stagger: 0.05 },
+            { opacity: 1, duration: 1.5, ease: "sine.inOut", stagger: 0.05 },
             0.3,
           );
         } else if (!e.isIntersecting && e.boundingClientRect.top > 0 && tl) {
           tl.kill();
           tl = null;
           gsap.set(inner, { y: 0 });
-          gsap.set(parts, { autoAlpha: 0 });
+          gsap.set(parts, { opacity: 0 });
         }
       },
       { threshold: 0.05 },

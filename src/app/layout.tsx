@@ -5,6 +5,8 @@ import { JsonLd } from "@/components/JsonLd";
 import { ScrollProvider } from "@/components/motion/ScrollProvider";
 import { Cursor } from "@/components/chrome/Cursor";
 import { InkTransition } from "@/components/motion/InkTransition";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
 import "./globals.css";
 import "./story.css";
@@ -65,6 +67,9 @@ export default function RootLayout({
         <ScrollProvider>{children}</ScrollProvider>
         <Cursor />
         <InkTransition />
+        {/* Cookieless; they collect once Web Analytics and Speed Insights are switched on for the Vercel project. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

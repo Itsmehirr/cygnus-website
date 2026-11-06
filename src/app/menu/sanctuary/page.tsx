@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 export default function SanctuaryMenuPage() {
   return (
     <main id="main" className="menu page-in" aria-label="Collections menu">
+      <h1 className="sr-only">Collections</h1>
       <MenuGround />
       <div className="menu__top container">
         <Link href="/sanctuary" className="menu__close">
