@@ -104,7 +104,7 @@ Vercel Web Analytics and Speed Insights are mounted in the root layout. Both are
 
 ## Browser support
 
-Current Chrome, Edge, Safari (15.4+, iOS included) and Firefox. The intro's `:has()` rule degrades on Firefox before 121 (the chrome simply shows during the opening). Films autoplay muted; where a phone blocks autoplay (Low Power Mode) the posters stay. Without WebGL the wall is absent and the Menu falls back to a CSS light that follows the pointer.
+Current Chrome, Edge, Safari (15.4+, iOS included) and Firefox. The intro's `:has()` rule degrades on Firefox before 121 (the chrome simply shows during the opening). Films autoplay muted; where a phone blocks autoplay (Low Power Mode) the posters stay. Without WebGL the wall is absent and the Menu falls back to a CSS light that follows the pointer. The sound uses Web Audio, which every current browser has; it has been tested in Chromium (desktop, and phone and tablet emulation), not yet on a real iPhone, in Safari or in Firefox. Without scripts the Sound switch is not shown.
 
 ## Phases
 
