@@ -638,13 +638,13 @@ select {
   transition: background-color 400ms var(--ease);
 }
 
-/* Immersive Garden's chrome: no bar, nothing centred; "Menu" at the top
-   right with the small mark beside it, both blending over any ground. */
+/* Immersive Garden's chrome: no bar, nothing centred; the small mark at the
+   top left, "Menu" alone at the top right, both blending over any ground. */
 .header__bar {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 22px;
   height: 96px;
 }
@@ -655,14 +655,12 @@ select {
 }
 
 .header__menu {
-  order: 1;
   font-size: 15px;
   letter-spacing: 0.01em;
   padding: 8px 0;
 }
 
 .header__home {
-  order: 2;
   display: inline-flex;
   align-items: center;
   transition: opacity 600ms var(--ease);
@@ -674,8 +672,8 @@ select {
   margin-right: -0.32em;
 }
 
-/* Home: the mark joins "Menu" once the axis has let go (the reference's
-   logo docking beside the menu button). */
+/* Home: the mark appears at the top left once the axis has let go (the
+   reference's logo docking as the page starts to move). */
 body[data-home] .header__home {
   opacity: 0;
   visibility: hidden;
@@ -791,9 +789,9 @@ html:not(.is-ready):has(.hero) .sound {
   }
 }
 
-/* The same top-right cluster as the header: "Close —" and the small mark. */
+/* The same corners as the header: the small mark at the left, "Close —" at the right. */
 .menu__top {
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 22px;
   height: 96px;
 }

@@ -23,12 +23,12 @@ export default function MenuPage() {
       <h1 className="sr-only">Menu</h1>
       <MenuGround />
       <div className="menu__top container">
+        <Link href="/" className="menu__mark" aria-label="Cygnus — home">
+          <Wordmark size="nav" />
+        </Link>
         <Link href="/" className="menu__close">
           Close
           <span className="menu__dash" aria-hidden="true" />
-        </Link>
-        <Link href="/" className="menu__mark" aria-label="Cygnus — home">
-          <Wordmark size="nav" />
         </Link>
       </div>
 

@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Wordmark } from "./Wordmark";
 
 /**
- * Immersive Garden's chrome: no bar, nothing centred. "Menu" sits at the top
- * right with the small mark beside it; on Home the mark joins it only once the
- * axis has let go (body.is-docked).
+ * Immersive Garden's chrome: no bar, nothing centred. The small mark sits at
+ * the top left and "Menu" alone at the top right, on every page; on Home the
+ * mark appears only once the axis has let go (body.is-docked).
  */
 export function SiteHeader() {
   return (
