@@ -478,9 +478,11 @@
   padding-top: 4vh;
 }
 
+/* A panel set low keeps clear of the Sanctuary pill at the bottom centre
+   (8 px + its 52 px + air), so its button is never under it. */
 .story.is-engine .room__item--bottom {
   align-items: flex-end;
-  padding-bottom: 4vh;
+  padding-bottom: max(4vh, 84px);
 }
 
 .story.is-engine .room__media {
