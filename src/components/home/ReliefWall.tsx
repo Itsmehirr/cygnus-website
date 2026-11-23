@@ -102,12 +102,12 @@ uniform vec3 u_lit;
 uniform vec2 u_form;
 varying vec2 v_uv;
 varying vec2 v_scr;
-float swell(vec2 uv) {
-  vec4 t = texture2D(u_reveal, uv);
-  return t.r * (1.0 - t.g);
+float risen(vec2 uv) {
+  return texture2D(u_reveal, uv).r;
 }
 void main() {
-  float e = swell(v_scr);
+  vec4 t = texture2D(u_reveal, v_scr);
+  float e = t.r * (1.0 - t.g);
   if (e < 0.004) {
     gl_FragColor = vec4(0.0);
     return;
@@ -116,8 +116,9 @@ void main() {
   float from = (1.0 - h) * 0.38;
   float up = smoothstep(from, from + 0.6, e) * u_ready;
   float s = texture2D(u_shade, vec2(v_uv.x, u_vmap.x + v_uv.y * u_vmap.y)).r - ${ZERO};
-  float gx = swell(v_scr + vec2(u_step.x, 0.0)) - swell(v_scr - vec2(u_step.x, 0.0));
-  float gy = swell(v_scr + vec2(0.0, u_step.y)) - swell(v_scr - vec2(0.0, u_step.y));
+  // The slope of the swell itself (never of a clearing's edge).
+  float gx = risen(v_scr + vec2(u_step.x, 0.0)) - risen(v_scr - vec2(u_step.x, 0.0));
+  float gy = risen(v_scr + vec2(0.0, u_step.y)) - risen(v_scr - vec2(0.0, u_step.y));
   float rim = (0.66 * gx - 0.75 * gy) * h * u_form.y;
   float sh = (s + u_form.x * (0.35 + 0.65 * h)) * up + rim * sqrt(up);
   float dark = clamp(-sh * u_k.x, 0.0, u_k.z);
@@ -135,6 +136,9 @@ void main() {
   vec2 d = (v_scr - u_glow.xy) / u_reach;
   float r = dot(d, d);
   float a = (exp(-r * 1.1) * 0.1 + exp(-r * 4.0) * 0.06) * u_glow.z;
+  // A grain of noise keeps so slow a gradient from banding on the dark stone.
+  float n = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
+  a = max(a + n * smoothstep(0.0, 0.012, a) / 255.0, 0.0);
   gl_FragColor = vec4(vec3(0.8, 0.83, 0.64) * a, a);
 }`;
 
@@ -149,9 +153,9 @@ type Look = {
 
 const THEMES: Record<Theme, Look> = {
   // Plaster pressed out of the warm stone: it reads by its shadows.
-  light: { k: [2.35, 2.2, 0.8, 0.85], shadow: [0.36, 0.29, 0.21], lit: [1, 0.995, 0.98], form: [0, 1.8] },
-  // Carved in the charcoal: there the raised faces catch the light.
-  dark: { k: [2.4, 2.6, 0.85, 0.62], shadow: [0, 0, 0], lit: [0.93, 0.94, 0.84], form: [0.085, 1.8] },
+  light: { k: [2.35, 2.2, 0.8, 0.85], shadow: [0.36, 0.29, 0.21], lit: [1, 0.995, 0.98], form: [0, 0.5] },
+  // Carved in the charcoal: the faces stay dark stone, their edges catch the light.
+  dark: { k: [2.6, 4.2, 0.9, 0.72], shadow: [0, 0, 0], lit: [0.93, 0.94, 0.84], form: [0.03, 0.3] },
 };
 
 const smooth = (a: number, b: number, x: number) => {
@@ -655,7 +659,7 @@ export function ReliefWall({ theme = "light", waitForIntro = true, start = 0 }: 
         gl.colorMask(true, false, false, false);
         drawMarks(s$);
 
-        const feather = Math.min(56, Math.max(30, w * 0.032));
+        const feather = Math.min(56, Math.max(36, w * 0.032));
         const pad = feather * 0.3;
         count = 0;
         for (const el of near) {
@@ -707,7 +711,7 @@ export function ReliefWall({ theme = "light", waitForIntro = true, start = 0 }: 
         gl.enableVertexAttribArray(w$.aPos);
         gl.vertexAttribPointer(w$.aPos, 2, gl.FLOAT, false, 0, 0);
         gl.uniform2f(w$.res, w, h);
-        gl.uniform2f(w$.step, 2 / target.w, 2 / target.h);
+        gl.uniform2f(w$.step, radius / 12 / w, radius / 12 / h);
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, target.tex);
         const x0 = (w - world) / 2;
