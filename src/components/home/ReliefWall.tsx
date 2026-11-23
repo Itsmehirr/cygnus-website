@@ -12,8 +12,11 @@ const ZERO = (176 / 255).toFixed(4);
 /** The strip is one screen wide, and never narrower than this (CSS px): a
  *  phone looks at its middle, so the figures keep their size. */
 const MIN_WORLD = 900;
-/** A stretch of the trail sinks back over this many seconds. */
-const LIFE = 3.1;
+/** A stretch of the trail holds for HOLD seconds, then has sunk back by LIFE. */
+const HOLD = 0.35;
+const LIFE = 2.2;
+/** How far out (CSS px) the shading is averaged: the relief's edges are soft, not cut. */
+const SOFT = 1.8;
 
 /* Where the pointer was last seen, kept across pages: the Menu opens with the
    wall already risen under the cursor that clicked its way there. */
@@ -95,6 +98,7 @@ uniform sampler2D u_height;
 uniform sampler2D u_reveal;
 uniform vec4 u_vmap;
 uniform vec2 u_step;
+uniform vec2 u_soft;
 uniform float u_ready;
 uniform vec4 u_k;
 uniform vec3 u_shadow;
@@ -115,7 +119,12 @@ void main() {
   float h = texture2D(u_height, vec2(v_uv.x, u_vmap.z + v_uv.y * u_vmap.w)).r;
   float from = (1.0 - h) * 0.38;
   float up = smoothstep(from, from + 0.6, e) * u_ready;
-  float s = texture2D(u_shade, vec2(v_uv.x, u_vmap.x + v_uv.y * u_vmap.y)).r - ${ZERO};
+  // The shading, softened: the point itself and four neighbours a little way out.
+  vec2 suv = vec2(v_uv.x, u_vmap.x + v_uv.y * u_vmap.y);
+  float s = texture2D(u_shade, suv).r * 0.36
+    + (texture2D(u_shade, suv + vec2(u_soft.x, 0.0)).r + texture2D(u_shade, suv - vec2(u_soft.x, 0.0)).r
+     + texture2D(u_shade, suv + vec2(0.0, u_soft.y)).r + texture2D(u_shade, suv - vec2(0.0, u_soft.y)).r) * 0.16
+    - ${ZERO};
   // The slope of the swell itself (never of a clearing's edge).
   float gx = risen(v_scr + vec2(u_step.x, 0.0)) - risen(v_scr - vec2(u_step.x, 0.0));
   float gy = risen(v_scr + vec2(0.0, u_step.y)) - risen(v_scr - vec2(0.0, u_step.y));
@@ -135,7 +144,7 @@ varying vec2 v_scr;
 void main() {
   vec2 d = (v_scr - u_glow.xy) / u_reach;
   float r = dot(d, d);
-  float a = (exp(-r * 1.1) * 0.1 + exp(-r * 4.0) * 0.06) * u_glow.z;
+  float a = (exp(-r * 1.1) * 0.075 + exp(-r * 4.0) * 0.045) * u_glow.z;
   // A grain of noise keeps so slow a gradient from banding on the dark stone.
   float n = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
   a = max(a + n * smoothstep(0.0, 0.012, a) / 255.0, 0.0);
@@ -152,10 +161,10 @@ type Look = {
 };
 
 const THEMES: Record<Theme, Look> = {
-  // Plaster pressed out of the warm stone: it reads by its shadows.
-  light: { k: [2.35, 2.2, 0.8, 0.85], shadow: [0.36, 0.29, 0.21], lit: [1, 0.995, 0.98], form: [0, 0.5] },
-  // Carved in the charcoal: the faces stay dark stone, their edges catch the light.
-  dark: { k: [2.6, 4.2, 0.9, 0.72], shadow: [0, 0, 0], lit: [0.93, 0.94, 0.84], form: [0.03, 0.3] },
+  // Plaster pressed out of the warm stone: it reads by its shadows, quietly.
+  light: { k: [1.7, 1.6, 0.6, 0.64], shadow: [0.36, 0.29, 0.21], lit: [1, 0.995, 0.98], form: [0, 0.36] },
+  // Carved in the charcoal: the faces stay dark stone, their edges catch a low light.
+  dark: { k: [1.85, 3.0, 0.66, 0.54], shadow: [0, 0, 0], lit: [0.93, 0.94, 0.84], form: [0.02, 0.21] },
 };
 
 const smooth = (a: number, b: number, x: number) => {
@@ -254,7 +263,7 @@ export function ReliefWall({ theme = "light", waitForIntro = true, start = 0 }: 
       gl.bufferData(gl.ARRAY_BUFFER, marks.byteLength, gl.DYNAMIC_DRAW);
 
       const w$ = {
-        res: at(wallProg, "u_res"), rect: at(wallProg, "u_rect"), vmap: at(wallProg, "u_vmap"), step: at(wallProg, "u_step"),
+        res: at(wallProg, "u_res"), rect: at(wallProg, "u_rect"), vmap: at(wallProg, "u_vmap"), step: at(wallProg, "u_step"), soft: at(wallProg, "u_soft"),
         ready: at(wallProg, "u_ready"), aPos: gl.getAttribLocation(wallProg, "a_pos"),
       };
       gl.useProgram(wallProg);
@@ -658,7 +667,7 @@ export function ReliefWall({ theme = "light", waitForIntro = true, start = 0 }: 
           by1 = Math.max(by1, y + r);
         };
         stamp(head.x, head.y, radius, presence);
-        for (const s of stamps) stamp(s.x, s.y - scroll, radius * 0.94, s.level * (1 - smooth(0.5, LIFE, clock - s.born)));
+        for (const s of stamps) stamp(s.x, s.y - scroll, radius * 0.94, s.level * (1 - smooth(HOLD, LIFE, clock - s.born)));
         gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
         gl.viewport(0, 0, target.w, target.h);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -742,6 +751,8 @@ export function ReliefWall({ theme = "light", waitForIntro = true, start = 0 }: 
           gl.bindTexture(gl.TEXTURE_2D, t.height);
           gl.uniform4f(w$.rect, x0, y, world, tileH);
           gl.uniform4f(w$.vmap, t.sv[0], t.sv[1], t.hv[0], t.hv[1]);
+          // SOFT px across the tile (as wide as the world, half as tall), in the map's own coordinates.
+          gl.uniform2f(w$.soft, SOFT / world, (SOFT / tileH) * t.sv[1]);
           gl.uniform1f(w$.ready, t.ready);
           gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
