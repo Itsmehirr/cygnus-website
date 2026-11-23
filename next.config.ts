@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  // Addresses that changed while the site was being shaped. Temporary (307)
+  // until launch, so nothing is cached for good while names may still move.
+  async redirects() {
+    return [{ source: "/design", destination: "/the-house", permanent: false }];
+  },
   async headers() {
     return [
       {

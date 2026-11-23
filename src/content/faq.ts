@@ -24,7 +24,7 @@ export const faq = [
   },
   {
     q: "How is a Cygnus piece acquired?",
-    a: "By enquiry. Every piece in the Sanctuary leads to a conversation with the house rather than a checkout. We reply personally and in order.",
+    a: "By enquiry. Every piece in the Design Sanctuary leads to a conversation with the house rather than a checkout. We reply personally and in order.",
   },
   {
     q: "Can a piece be seen in person?",

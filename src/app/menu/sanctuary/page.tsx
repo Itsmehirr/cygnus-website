@@ -62,7 +62,7 @@ export default function SanctuaryMenuPage() {
 
       <div className="menu__foot container">
         <Link href="/menu" className="menu__write" data-cursor="Menu">
-          The house
+          Menu
         </Link>
         <SoundToggle inline />
         <span className="menu__est menu__est--long">Every piece leads to an enquiry</span>

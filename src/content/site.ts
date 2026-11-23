@@ -37,12 +37,12 @@ export const site = {
 
   locale: "en",
 
-  /** Menu items: label, the line it expands into on the Menu page, and its numeral. */
+  /** Menu items, in the house's order: label, the line it expands into on the Menu page, and its numeral. */
   nav: [
-    { href: "/design", label: "Design", note: "The house", line: "where intellect becomes form", numeral: "I" },
-    { href: "/sanctuary", label: "Sanctuary", note: "Collections", line: "the collections", numeral: "II" },
-    { href: "/cygnature", label: "Cygnature", note: "Bespoke", line: "bespoke, by Cygnus", numeral: "III" },
-    { href: "/info", label: "Info", note: "Facts & contact", line: "the house, in plain terms", numeral: "IV" },
+    { href: "/sanctuary", label: "Design Sanctuary", note: "Collections", line: "where intellect becomes form", numeral: "I" },
+    { href: "/cygnature", label: "Cygnature", note: "Bespoke", line: "bespoke, by Cygnus", numeral: "II" },
+    { href: "/the-house", label: "The House", note: "Philosophy", line: "thought, given form", numeral: "III" },
+    { href: "/info", label: "Info", note: "Facts & contact", line: "facts, questions, contact", numeral: "IV" },
   ],
 
   /** Home copy, in the house's register. */

@@ -28,8 +28,7 @@ export function GET() {
     "",
     "## Pages",
     "",
-    `- [Design](${SITE_URL}/design): the house's philosophy, the geometry of light, the manifesto`,
-    `- [Sanctuary](${SITE_URL}/sanctuary): the collections, by category and by collection`,
+    `- [Design Sanctuary](${SITE_URL}/sanctuary): the collections, by category and by collection`,
     ...categories.map(
       (c) => `- [${c.name}](${SITE_URL}/sanctuary/category/${c.slug}): ${c.description}`,
     ),
@@ -38,6 +37,7 @@ export function GET() {
     ),
     `- [Cygnature](${SITE_URL}/cygnature): the bespoke service, with a walkthrough of how a commission unfolds`,
     `- [Cygnature registration](${SITE_URL}/cygnature/register): register interest in a commission`,
+    `- [The House](${SITE_URL}/the-house): the house's philosophy, the geometry of light, the manifesto`,
     `- [Info](${SITE_URL}/info): facts about the house, questions answered, care and contact`,
     "",
     "## Pieces",

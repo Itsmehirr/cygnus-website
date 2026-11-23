@@ -7,21 +7,23 @@ import { Picture } from "@/components/Picture";
 import { ButtonLink } from "@/components/Button";
 
 export const metadata: Metadata = pageMeta({
-  title: "Design",
+  title: "The House",
   description:
-    "The design philosophy of Cygnus: proprietary, trademarked diamond geometries conceived through contemporary ingenuity, transforming grown carbon into structural art.",
-  path: "/design",
+    "The house of Cygnus and its design philosophy: proprietary, trademarked diamond geometries conceived through contemporary ingenuity, transforming grown carbon into structural art.",
+  path: "/the-house",
 });
 
-export default function DesignPage() {
+/* The House: the philosophy, the geometry of light, the three principles and
+   the manifesto (the page the sitemap first called Design). */
+export default function TheHousePage() {
   return (
     <>
       <section className="section--top">
         <div className="container stack--loose">
-          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Design", href: "/design" }]} />
+          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "The House", href: "/the-house" }]} />
           <div className="split">
             <div className="stack">
-              <p className="label">Design</p>
+              <p className="label">The House</p>
               <h1 className="display-1">Thought, given form.</h1>
               <p className="lede">
                 Cygnus crafts design-forward high jewellery anchored by

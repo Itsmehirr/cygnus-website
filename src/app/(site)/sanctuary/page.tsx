@@ -17,10 +17,10 @@ import { Paragraph } from "@/components/motion/Paragraph";
 import { LandOnHash } from "@/components/motion/LandOnHash";
 
 const description =
-  "The Sanctuary holds the Cygnus collections: rings, earrings, necklaces and bracelets, by category or by collection. Every piece leads to an enquiry with the house.";
+  "The Design Sanctuary holds the Cygnus collections: rings, earrings, necklaces and bracelets, by category or by collection. Every piece leads to an enquiry with the house.";
 
 export const metadata: Metadata = pageMeta({
-  title: "Sanctuary — The Collections",
+  title: "Design Sanctuary — The Collections",
   description,
   path: "/sanctuary",
 });
@@ -77,14 +77,14 @@ const chapters: StoryChapter[] = collections.map((col) => {
   };
 });
 
-/* The Sanctuary: a title band, a gallery that drifts, then the collections as
+/* The Design Sanctuary: a title band, a gallery that drifts, then the collections as
    rooms in the Capitolium grammar. Every image and panel is a real link. */
 export default function SanctuaryPage() {
   return (
     <>
       <JsonLd
         data={collectionPageSchema({
-          name: "Sanctuary — The Cygnus Collections",
+          name: "Design Sanctuary — The Cygnus Collections",
           description,
           path: "/sanctuary",
         })}
@@ -93,7 +93,7 @@ export default function SanctuaryPage() {
       <section className="sanctum" aria-labelledby="sanctuary">
         <div className="container">
           <h1 id="sanctuary" className="sanctum__title">
-            Sanctuary
+            Design Sanctuary
           </h1>
           <Paragraph className="sanctum__lede">
             The collections of the house, by collection or by category. Every piece leads to a conversation rather than a checkout.
@@ -129,7 +129,7 @@ export default function SanctuaryPage() {
 
       <Story chapters={chapters} />
 
-      <section className="sanctum-coda" aria-label="More from the Sanctuary">
+      <section className="sanctum-coda" aria-label="More from the Design Sanctuary">
         <div className="container center">
           <p className="label">Further collections to follow</p>
           <p className="sanctum__cats">

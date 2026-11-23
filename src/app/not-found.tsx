@@ -8,7 +8,7 @@ export default function NotFound() {
         <h1 className="display-2">This page has no form yet.</h1>
         <p className="lede">
           The address may have changed, or the piece may not be in the
-          Sanctuary.
+          Design Sanctuary.
         </p>
         <p>
           <Link href="/" className="link">

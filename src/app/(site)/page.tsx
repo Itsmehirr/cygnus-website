@@ -25,7 +25,7 @@ export const metadata: Metadata = pageMeta({
 /* Home, in Immersive Garden's grammar on the house's stone: the axis (which is
    also the opening), the statement, the story film as the showreel, the house
    in a centred paragraph, then media and large captions alternating, and the
-   way into the Sanctuary. Nothing is pinned; the page keeps flowing. */
+   way into the Design Sanctuary. Nothing is pinned; the page keeps flowing. */
 export default function HomePage() {
   const inPublic = (p: string) => fs.existsSync(path.join(process.cwd(), "public", p));
   const videoReady = site.storyVideo.ready || inPublic(site.storyVideo.src);
@@ -106,7 +106,7 @@ export default function HomePage() {
                 {makingB.text}
               </Paragraph>
               <p className="band__title">
-                <Link href="/design" className="link" data-cursor="Read">
+                <Link href="/the-house" className="link" data-cursor="Read">
                   {makingB.title}
                 </Link>
               </p>
@@ -141,7 +141,7 @@ export default function HomePage() {
             <Paragraph as="h2" className="band__caption" id="sanctuary">
               {featured.name}, the first collection. {featured.description}
             </Paragraph>
-            <ButtonLink href="/sanctuary">Enter the Sanctuary</ButtonLink>
+            <ButtonLink href="/sanctuary">Enter the Design Sanctuary</ButtonLink>
           </div>
         </div>
       </section>
@@ -191,8 +191,8 @@ export default function HomePage() {
       <ScrollTilt />
       <ReliefWall />
 
-      <Link href="/sanctuary" className="see-all" aria-label="Enter the Sanctuary">
-        {["Enter", "the", "Sanctuary"].map((w, i, all) => (
+      <Link href="/sanctuary" className="see-all" aria-label="Enter the Design Sanctuary">
+        {["Enter", "the", "Design", "Sanctuary"].map((w, i, all) => (
           <span key={w} className="see-all__w" style={{ ["--d" as string]: all.length - 1 - i }} aria-hidden="true">
             {w}
           </span>

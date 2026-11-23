@@ -39,7 +39,7 @@ export default function InfoPage() {
                 <dt>Signature</dt>
                 <dd>Proprietary, trademarked diamond geometries</dd>
                 <dt>Acquisition</dt>
-                <dd>By enquiry, through the Sanctuary</dd>
+                <dd>By enquiry, through the Design Sanctuary</dd>
                 <dt>Bespoke</dt>
                 <dd>
                   <Link href="/cygnature" className="link">
@@ -79,7 +79,7 @@ export default function InfoPage() {
             </a>
           </p>
           <p className="measure muted">
-            For a piece in the Sanctuary, use the enquiry on its page. For a
+            For a piece in the Design Sanctuary, use the enquiry on its page. For a
             commission, register through Cygnature. For everything else, the
             address above reaches the house directly.
           </p>

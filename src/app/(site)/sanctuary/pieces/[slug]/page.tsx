@@ -96,7 +96,7 @@ export default async function PiecePage({ params }: { params: Promise<Params> })
               <Breadcrumbs
                 items={[
                   { name: "Home", href: "/" },
-                  { name: "Sanctuary", href: "/sanctuary" },
+                  { name: "Design Sanctuary", href: "/sanctuary" },
                   ...(category ? [{ name: category.name, href: `/sanctuary/category/${category.slug}` }] : []),
                   { name: piece.name, href: `/sanctuary/pieces/${piece.slug}` },
                 ]}

@@ -57,7 +57,7 @@ export default async function CategoryPage({
           <Breadcrumbs
             items={[
               { name: "Home", href: "/" },
-              { name: "Sanctuary", href: "/sanctuary" },
+              { name: "Design Sanctuary", href: "/sanctuary" },
               { name: cat.name, href: `/sanctuary/category/${cat.slug}` },
             ]}
           />

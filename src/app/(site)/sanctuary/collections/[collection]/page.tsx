@@ -49,7 +49,7 @@ export default async function CollectionPage({
       <Breadcrumbs
         items={[
           { name: "Home", href: "/" },
-          { name: "Sanctuary", href: "/sanctuary" },
+          { name: "Design Sanctuary", href: "/sanctuary" },
           { name: col.name, href: `/sanctuary/collections/${col.slug}` },
         ]}
       />

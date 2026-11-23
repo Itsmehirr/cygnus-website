@@ -19,7 +19,7 @@ export function SiteFooter() {
           </div>
 
           <div className="footer__col">
-            <p className="label">The house</p>
+            <p className="label">Menu</p>
             {site.nav.map((item) => (
               <p key={item.href}>
                 <Link href={item.href} className="footer__link">

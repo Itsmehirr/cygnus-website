@@ -8,12 +8,12 @@ import { SoundToggle } from "@/components/chrome/SoundToggle";
 
 export const metadata: Metadata = {
   title: "Menu",
-  description: "Design, Sanctuary, Cygnature and Info: the four doors of the house.",
+  description: "Design Sanctuary, Cygnature, The House and Info: the four doors of the house.",
   robots: { index: false, follow: true },
 };
 
 /**
- * The House: a charcoal page rather than an overlay, reached by cross-fade.
+ * The Menu: a charcoal page rather than an overlay, reached by cross-fade.
  * A light follows the pointer across the ground (CSS now; the relief and its
  * WebGL light arrive in Phase 3). Items expand into their line on hover.
  */
