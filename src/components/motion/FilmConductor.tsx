@@ -28,14 +28,24 @@ export function FilmConductor() {
     const seen = (v: HTMLVideoElement) => area.get(v) ?? 0;
     const turn = (v: HTMLVideoElement) => Math.min(12, Math.max(4, v.duration || 6)) * 1000;
 
+    // The film giving way stops first and the next starts a few frames
+    // later, so the two never overlap, not even for a frame.
+    let starting = 0;
     const apply = () => {
+      let stopped = false;
       for (const v of films) {
+        if (v.paused || v === lead) continue;
         if (seen(v) > 0) {
-          if (v === lead) {
-            if (v.paused) v.play().catch(() => {});
-          } else if (!v.paused) v.pause();
-        } else if (v.muted && !v.paused) v.pause();
+          v.pause();
+          stopped = true;
+        } else if (v.muted) v.pause();
       }
+      window.clearTimeout(starting);
+      const start = () => {
+        if (lead && seen(lead) > 0 && lead.paused) lead.play().catch(() => {});
+      };
+      if (stopped) starting = window.setTimeout(start, 90);
+      else start();
     };
 
     const follow = (next: HTMLVideoElement | null, held = 0) => {
@@ -138,6 +148,7 @@ export function FilmConductor() {
     return () => {
       window.clearInterval(rotation);
       window.clearTimeout(again);
+      window.clearTimeout(starting);
       document.removeEventListener("pointerover", onOver);
       document.removeEventListener("visibilitychange", decide);
       for (const v of films) v.removeEventListener("volumechange", decide);
