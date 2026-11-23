@@ -8,7 +8,7 @@ import { useLenis } from "./ScrollProvider";
 /**
  * Re-keys its children on every route so the new page fades in (CSS .page-in),
  * and, because it mounts together with the new page's DOM, lands a hash target
- * (e.g. /sanctuary#pearl) once the pinned sections have measured themselves.
+ * (e.g. /sanctuary#collections) once the pinned sections have measured themselves.
  */
 export function PageFade({ children }: { children: ReactNode }) {
   const pathname = usePathname();

@@ -895,7 +895,7 @@ html:not(.is-ready):has(.hero) .sound {
 
 .menu__link:hover .menu__more,
 .menu__link:focus-visible .menu__more {
-  max-width: 24ch;
+  max-width: 30ch;
   opacity: 1;
   filter: blur(0);
 }

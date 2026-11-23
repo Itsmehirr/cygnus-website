@@ -41,9 +41,6 @@ export default function SanctuaryMenuPage() {
                 </Link>
               </li>
             ))}
-            <li className="menu__item menu__item--soon">
-              <span className="menu__name">Further collections to follow</span>
-            </li>
           </ul>
         </div>
         <div className="menu__group">

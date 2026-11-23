@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { site } from "@/content/site";
 import { collections } from "@/content/collections";
-import { piecesByCollection } from "@/content/pieces";
+import { pieces } from "@/content/pieces";
 import { pageMeta } from "@/lib/seo";
 import { Hero } from "@/components/home/Hero";
 import { Dissolve, Paragraph } from "@/components/motion/Paragraph";
@@ -30,8 +30,10 @@ export default function HomePage() {
   const inPublic = (p: string) => fs.existsSync(path.join(process.cwd(), "public", p));
   const videoReady = site.storyVideo.ready || inPublic(site.storyVideo.src);
   const posterReady = inPublic(site.storyVideo.poster);
-  const featured = collections[0];
-  const featuredPieces = piecesByCollection(featured.slug).slice(0, 3);
+  // Three frames from the collections, in the house's order.
+  const featuredPieces = pieces.slice(0, 3);
+  const names = collections.map((c) => c.name);
+  const collectionNames = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0];
   const [makingA, makingB] = site.home.making;
 
   return (
@@ -115,7 +117,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* The first collection: three frames stepping down the page */}
+      {/* The collections: three frames stepping down the page */}
       <section className="teaser" aria-labelledby="sanctuary">
         <div className="container">
           <div className="teaser__frames">
@@ -139,7 +141,7 @@ export default function HomePage() {
           </div>
           <div className="teaser__text">
             <Paragraph as="h2" className="band__caption" id="sanctuary">
-              {featured.name}, the first collection. {featured.description}
+              {collectionNames}: the collections of the house. Engineered diamond geometries from grown carbon, set in noble metals.
             </Paragraph>
             <ButtonLink href="/sanctuary">Enter the Design Sanctuary</ButtonLink>
           </div>

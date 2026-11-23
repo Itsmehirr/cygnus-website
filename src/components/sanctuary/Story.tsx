@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ScrollTrigger } from "@/lib/gsap";
 import { Wordmark } from "@/components/Wordmark";
+import { ButtonLink } from "@/components/Button";
 import { Hotspot } from "./Hotspot";
 
 /* ------------------------------------------------------------------------
-   The Sanctuary story: one pinned room per collection, in Capitolium's
+   The Design Sanctuary's story: a pinned room (one today, holding the
+   collections as its panels; the engine takes any number), in Capitolium's
    grammar (collabcapitolium.fr, BlockStory / Chapter / ChapterArchs):
 
      pre    -0.25 → 0    the next room waits behind, sliding in at 30 % parallax
@@ -36,6 +38,8 @@ export type StoryItem = {
   text: string;
   href?: string;
   linkText?: string;
+  /** The link is the panel's call to action: set as a button. */
+  cta?: boolean;
   hotspot?: [string, string];
 };
 export type StoryChapter = {
@@ -394,9 +398,7 @@ function Head({ chapter, variant }: { chapter: StoryChapter; variant: "base" | "
     <div className={`room__head room__head--${variant}`} aria-hidden={variant === "arch" || undefined}>
       <span className="room__rule" />
       <div className="room__head-top">
-        <span>{chapter.name}</span>
         <Wordmark size="chapter" as="div" />
-        <span>{chapter.name}</span>
       </div>
       <div className="room__head-bottom">
         <span className="room__star" aria-hidden="true" />
@@ -407,17 +409,27 @@ function Head({ chapter, variant }: { chapter: StoryChapter; variant: "base" | "
   );
 }
 
+/** The room's name in the script: letter by letter (they rise one after
+ *  another), kept together word by word (so a resting title breaks between
+ *  words, never inside one). */
 function Title({ text, clip = false }: { text: string; clip?: boolean }) {
-  const chars = Array.from(text);
+  const words = text.split(" ");
   return (
     <div className={`room__title${clip ? " room__title--clip" : ""}`} data-title={text} aria-hidden="true">
       <div className="room__title-track">
         {[0, 1].map((k) => (
           <span key={k} className="room__copy">
-            {chars.map((c, i) => (
-              <span key={i} className={`room__char${c === " " ? " room__char--space" : ""}`}>
-                {c}
-              </span>
+            {words.map((word, w) => (
+              <Fragment key={w}>
+                {w > 0 ? <span className="room__char room__char--space"> </span> : null}
+                <span className="room__word">
+                  {Array.from(word).map((c, i) => (
+                    <span key={i} className="room__char">
+                      {c}
+                    </span>
+                  ))}
+                </span>
+              </Fragment>
             ))}
             <span className="room__sep">·</span>
           </span>
@@ -487,11 +499,17 @@ function Room({ chapter, index, total }: { chapter: StoryChapter; index: number;
                   <h4 className="room__text-title">{it.href ? <Link href={it.href}>{it.title}</Link> : it.title}</h4>
                   <p>{it.text}</p>
                   {it.href && it.linkText ? (
-                    <p>
-                      <Link href={it.href} className="link">
-                        {it.linkText}
-                      </Link>
-                    </p>
+                    it.cta ? (
+                      <p className="room__cta">
+                        <ButtonLink href={it.href}>{it.linkText}</ButtonLink>
+                      </p>
+                    ) : (
+                      <p>
+                        <Link href={it.href} className="link">
+                          {it.linkText}
+                        </Link>
+                      </p>
+                    )
                   ) : null}
                 </div>
               </div>

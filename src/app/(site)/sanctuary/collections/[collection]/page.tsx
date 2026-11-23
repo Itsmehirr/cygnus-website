@@ -42,7 +42,6 @@ export default async function CollectionPage({
   if (!col) notFound();
 
   const list = piecesByCollection(col.slug);
-  const hero = list[0]?.images[1] ?? list[0]?.images[0];
 
   const body = (
     <div className="stack--loose">
@@ -61,8 +60,8 @@ export default async function CollectionPage({
           <p className="measure muted">{col.story}</p>
         </div>
         <Picture
-          src={hero?.src ?? `/images/collections/${col.slug}-hero.jpg`}
-          alt={hero?.alt ?? `${col.name} collection by Cygnus`}
+          src={col.hero.src}
+          alt={col.hero.alt}
           ratio="landscape"
           sizes="(min-width: 880px) 58vw, 100vw"
           priority

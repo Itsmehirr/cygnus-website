@@ -21,19 +21,19 @@ npm run lint
 src/app
   layout.tsx            html/body, fonts, JSON-LD, Lenis, cursor, ink transition, analytics
   (site)/               every page with header and footer
-    page.tsx            Home: opening axis, statement, story film, the house, making, Pearl, Cygnature, close
-    design/             Design
-    sanctuary/          the Sanctuary story (collections as rooms), by category, by collection, piece pages → enquiry
+    page.tsx            Home: opening axis, statement, story film, the house, making, the collections, Cygnature, close
+    sanctuary/          the Design Sanctuary: one room, the collections as its panels; by category, by collection, piece pages → enquiry
     cygnature/          bespoke: film, picture, text → registration → a note from the house
+    the-house/          The House: the philosophy, the geometry of light, the manifesto (/design forwards here)
     info/               facts, questions answered, write to us
-  menu/                 the Menu ("The House"): the forest carved in charcoal, rising under the cursor
+  menu/                 the Menu (Design Sanctuary, Cygnature, The House, Info): the forest carved in charcoal, rising under the cursor
   actions.ts            server actions: enquiry and registration (honeypot, validation, mail)
   sitemap.ts robots.ts llms.txt/   SEO / AEO / GEO surface
   globals.css story.css            design system, Home grammar, Sanctuary grammar
 src/components
   home/                 Hero (opening), ReliefWall (the sculpted wall, Home and Menu)
   motion/               ScrollProvider (Lenis), Reveal, Paragraph + Dissolve, MediaFade, ScrollTilt, FilmConductor, InkTransition, FooterMotion
-  sanctuary/            Story (room engine), StoryNav, Hotspot, ScrollThumb, GalleryDrift
+  sanctuary/            Story (room engine), StoryNav (the Sanctuary pill and its two lists), Hotspot, ScrollThumb, GalleryDrift
   chrome/               Cursor, Menu ground (dark relief wall; CSS light without WebGL), Ambience + SoundToggle (the sound and its switch)
 src/content             site facts, nav, home copy, collections, pieces, FAQ
 src/lib                 gsap registration, schema builders, metadata helper, mail adapter, ambience (the sound engine)
@@ -47,12 +47,12 @@ public/textures         the stone ground
 
 The site runs full motion for every visitor; like both references, it does not read the system "Reduce motion" setting (Lenis is told not to either, or its glide would be dropped for those visitors).
 
-- **Home, after immersive-g.com.** The opening builds the axis in place (wordmark mask sweep, the line word by word, a counter that hands over to "Scroll"), then the chrome fades in. Paragraphs reveal line by line; statements dissolve in letter by letter; films and pictures arrive by fading in (`MediaFade`); media lean with scroll speed (`ScrollTilt`). Lenis lerp 0.05. The cursor keeps the system pointer with three trailing dots and words from `data-cursor`. The Menu opens with an ink spreading from its corner.
+- **Home, after immersive-g.com.** The opening builds the axis in place (wordmark mask sweep, the line word by word, a counter that hands over to "Scroll"), then the chrome fades in. Paragraphs reveal line by line; statements dissolve in letter by letter; films and pictures arrive by fading in (`MediaFade`); media lean with scroll speed (`ScrollTilt`). Lenis lerp 0.05. The cursor keeps the system pointer with three trailing dots and words from `data-cursor`. The Menu opens with an ink spreading from its corner. The small mark sits at the top left and "Menu" alone at the top right, on every page.
 - **The sculpted wall.** `ReliefWall` lays one continuous forest (swans, peonies, flowering branches, feathers, constellations) over the whole ground: one fixed WebGL layer under the page, drawn as shading only. It lies flat in the stone until the cursor passes; there it swells out, the tall figures first and the undergrowth after them, and it sinks back along the trail about two seconds later. It is drawn softly and with little contrast, so it stays a ground and never competes with the content. Every block of text keeps a clearing, so the forest forms round the content and never under the words. The strip is one screen wide and repeats down the page every two screen widths; its tiles load as the page reaches them, after the opening, and nothing is drawn while the wall is flat. On touch screens it rises under the finger and wanders on its own when nobody touches.
 - **The Menu** carries the same forest in its dark theme (`src/components/chrome/MenuGround.tsx`): carved in the charcoal, the forms keep the stone's tone and catch a chartreuse-white light on their edges, under a soft pool of light at the cursor.
 - **Films.** One film plays in view at a time (`FilmConductor`). Chrome draws the whole page at 30 frames a second while two videos play on screen, which shows as a stutter in the scroll; so the film holding most of the screen plays (or the one under the pointer, or the story film with its sound on), another in view holds its frame until its turn, and two that share the screen for long take turns, a loop each.
 - **Sound.** One soft ambience for the whole site (`src/lib/ambience.ts`, mounted once in the root layout so it plays on through navigation): a slow pad in D major with a few glass chimes in a long room. It is off until the visitor lets it in. On a desktop the cursor says "Click to enable sound" and, once it has said so, the first click anywhere switches it on, as on the reference; on touch screens, and on the pages without that cursor (the Sanctuary, the Menu), only the Sound switch does. Nothing else starts it: not scrolling, not a key, not a click made from the keyboard. There is always exactly one Sound switch on screen (`SoundToggle`): fixed at the bottom right of every page, and stepping aside while one set in the page is in view (the footer's last line, the Menu's foot); on the Sanctuary's phone layout it sits just above the pill. It is a switch named "Sound" to screen readers and works from the keyboard. The choice is remembered for the session; a page loaded with sound on waits for the first click or key, because browsers do not let audio start by itself, and until then the switch reads Off and pressing it lets the sound in. The track is fetched only when sound is switched on, loops with its last 6 seconds crossfaded into its first, fades in and out, rests while the tab is hidden, and plays 3 dB higher on phones and tablets, whose speakers lose the low half of the pad.
-- **Sanctuary, after collabcapitolium.fr.** Each collection is a pinned room: five round-topped arches onto one film, the centre arch opening to full screen, the gold script title rising and scrolling, panels travelling right to left on the diagonal, the room sliding away left. A framed pill opens the slate nav panel. Lenis 1.2 s expo on this route.
+- **The Design Sanctuary, after collabcapitolium.fr.** One pinned room: five round-topped arches onto one film, the centre arch opening to full screen, the gold script title ("Design Sanctuary") rising and scrolling, then the collections travelling right to left on the diagonal, one panel each (Lumen, Apeiron), with a "See Collection" button. A framed pill at the bottom, named Sanctuary, is its menu: the left half opens the four categories, the right half the collections, each stacked on a slate panel that wipes up (the right mouse button opens the collections too). The engine takes any number of rooms and panels. Lenis 1.2 s expo on this route.
 
 ## Assets: where to drop them
 
@@ -62,7 +62,7 @@ A missing file falls back to a poster or tonal placeholder; adding the file need
 | --- | --- | --- |
 | Story film | `public/media/story.mp4` + `story-poster.jpg` | H.264, muted loop, fast start; poster = first frame. If the real film has a soundtrack, set `storyVideo.sound` in `src/content/site.ts`: it is then unmuted while Sound is on |
 | Ambience | `public/media/ambience.mp3` | the site's sound; any track that is at full level at both ends (no fade in or out baked in) and at least 20 s long. The stand-in is rendered by `python3 scripts/ambience.py public/media/ambience.mp3` |
-| Collection film | `public/media/collections/pearl.mp4` + `pearl-poster.jpg` | plays through the Sanctuary arches |
+| Sanctuary film | `public/media/sanctuary.mp4` + `sanctuary-poster.jpg` | plays through the Design Sanctuary's arches |
 | Making films | `public/media/making-01.mp4`, `making-02.mp4` (+ `.jpg` posters) | 3:4 for the second |
 | Atelier film | `public/media/atelier.mp4` (+ `.jpg`) | Home and Cygnature |
 | Piece photography | `public/images/pieces/<slug>-01.jpg`, `-02.jpg` | listed per piece in `src/content/pieces.ts` |

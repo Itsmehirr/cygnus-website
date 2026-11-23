@@ -27,63 +27,64 @@ export const careNote =
   "Store the piece on its own, away from other jewellery. Keep it from cosmetics and perfume, and clean it with a soft cloth. The house will care for any piece on request.";
 
 /**
- * Placeholder pieces so every route in the sitemap renders.
+ * Placeholder pieces so every route in the sitemap renders: two under each
+ * collection, one in each category.
  * Replace with the house's pieces: one entry per piece, images under /public/images/pieces/.
  */
 export const pieces: Piece[] = [
   {
-    slug: "pearl-ring",
-    reference: "CYG-PRL-01",
-    name: "Pearl Ring",
-    collection: "pearl",
+    slug: "lumen-ring",
+    reference: "CYG-LUM-01",
+    name: "Lumen Ring",
+    collection: "lumen",
     category: "rings",
     description:
-      "A ring from the Pearl collection by Cygnus: a pearl held by an engineered diamond geometry, set in noble metal.",
+      "A ring from the Lumen collection by Cygnus: an engineered diamond geometry from grown carbon, set in noble metal.",
     images: [
-      { src: "/images/pieces/pearl-ring-01.jpg", alt: "Pearl Ring by Cygnus, worn at the hand" },
-      { src: "/images/pieces/pearl-ring-02.jpg", alt: "Pearl Ring by Cygnus, seen as an object" },
+      { src: "/images/pieces/lumen-ring-01.jpg", alt: "Lumen Ring by Cygnus, worn at the hand" },
+      { src: "/images/pieces/lumen-ring-02.jpg", alt: "Lumen Ring by Cygnus, seen as an object" },
     ],
     placeholder: true,
   },
   {
-    slug: "pearl-earrings",
-    reference: "CYG-PRL-02",
-    name: "Pearl Earrings",
-    collection: "pearl",
+    slug: "lumen-earrings",
+    reference: "CYG-LUM-02",
+    name: "Lumen Earrings",
+    collection: "lumen",
     category: "earrings",
     description:
-      "Earrings from the Pearl collection by Cygnus: pearls carried by engineered diamond geometries, set in noble metal.",
+      "Earrings from the Lumen collection by Cygnus: engineered diamond geometries from grown carbon, set in noble metal.",
     images: [
-      { src: "/images/pieces/pearl-earrings-01.jpg", alt: "Pearl Earrings by Cygnus, worn at the ear" },
-      { src: "/images/pieces/pearl-earrings-02.jpg", alt: "Pearl Earrings by Cygnus, seen as objects" },
+      { src: "/images/pieces/lumen-earrings-01.jpg", alt: "Lumen Earrings by Cygnus, worn at the ear" },
+      { src: "/images/pieces/lumen-earrings-02.jpg", alt: "Lumen Earrings by Cygnus, seen as objects" },
     ],
     placeholder: true,
   },
   {
-    slug: "pearl-necklace",
-    reference: "CYG-PRL-03",
-    name: "Pearl Necklace",
-    collection: "pearl",
+    slug: "apeiron-necklace",
+    reference: "CYG-APR-01",
+    name: "Apeiron Necklace",
+    collection: "apeiron",
     category: "necklaces",
     description:
-      "A necklace from the Pearl collection by Cygnus: pearls and engineered diamond geometries following the line of the neck, set in noble metal.",
+      "A necklace from the Apeiron collection by Cygnus: engineered diamond geometries following the line of the neck, set in noble metal.",
     images: [
-      { src: "/images/pieces/pearl-necklace-01.jpg", alt: "Pearl Necklace by Cygnus, worn" },
-      { src: "/images/pieces/pearl-necklace-02.jpg", alt: "Pearl Necklace by Cygnus, seen as an object" },
+      { src: "/images/pieces/apeiron-necklace-01.jpg", alt: "Apeiron Necklace by Cygnus, worn" },
+      { src: "/images/pieces/apeiron-necklace-02.jpg", alt: "Apeiron Necklace by Cygnus, seen as an object" },
     ],
     placeholder: true,
   },
   {
-    slug: "pearl-bracelet",
-    reference: "CYG-PRL-04",
-    name: "Pearl Bracelet",
-    collection: "pearl",
+    slug: "apeiron-bracelet",
+    reference: "CYG-APR-02",
+    name: "Apeiron Bracelet",
+    collection: "apeiron",
     category: "bracelets",
     description:
-      "A bracelet from the Pearl collection by Cygnus: pearls and engineered diamond geometries that move with the wrist, set in noble metal.",
+      "A bracelet from the Apeiron collection by Cygnus: engineered diamond geometries that move with the wrist, set in noble metal.",
     images: [
-      { src: "/images/pieces/pearl-bracelet-01.jpg", alt: "Pearl Bracelet by Cygnus, worn at the wrist" },
-      { src: "/images/pieces/pearl-bracelet-02.jpg", alt: "Pearl Bracelet by Cygnus, seen as an object" },
+      { src: "/images/pieces/apeiron-bracelet-01.jpg", alt: "Apeiron Bracelet by Cygnus, worn at the wrist" },
+      { src: "/images/pieces/apeiron-bracelet-02.jpg", alt: "Apeiron Bracelet by Cygnus, seen as an object" },
     ],
     placeholder: true,
   },

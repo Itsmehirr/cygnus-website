@@ -35,20 +35,13 @@
   border-bottom: 1px solid currentColor;
 }
 
+/* The mark alone, in the middle (the collection's name once stood either side). */
 .room__head-top {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 2vw;
   padding: 10px 0 8px;
   border-bottom: 1px solid currentColor;
-}
-
-.room__head-top > span {
-  font-family: var(--font-display);
-  font-size: clamp(0.8rem, 0.7rem + 0.3vw, 1rem);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 .wordmark--chapter {
@@ -119,7 +112,8 @@
   white-space: nowrap;
 }
 
-.room__copy {
+.room__copy,
+.room__word {
   display: inline-flex;
 }
 
@@ -152,6 +146,12 @@
   margin: 0 0 0.8em;
   text-align: justify;
   hyphens: auto;
+}
+
+/* A panel's call to action: the house's button, set off from the text. */
+.room__text .room__cta {
+  margin: 1.5em 0 0;
+  text-align: left;
 }
 
 .room__text-rule {
@@ -281,6 +281,17 @@
 .story:not(.is-engine) .room__copy + .room__copy,
 .story:not(.is-engine) .room__sep {
   display: none;
+}
+
+/* At rest a long name breaks between its words, never inside one. */
+.story:not(.is-engine) .room__title-track,
+.story:not(.is-engine) .room__copy {
+  display: block;
+  white-space: normal;
+}
+
+.story:not(.is-engine) .room__word {
+  white-space: nowrap;
 }
 
 .story:not(.is-engine) .room__panels {
@@ -446,6 +457,14 @@
   background-size: var(--stone-size);
 }
 
+/* When the panels end on an ordinary panel (no full-width one closes them),
+   room is left after it, so it comes to rest near the middle of the screen
+   instead of against its right edge. */
+.story.is-engine .room__panel:last-child::after {
+  content: "";
+  flex: 0 0 20vw;
+}
+
 .story.is-engine .room__item {
   flex: 0 0 auto;
   display: flex;
@@ -596,13 +615,11 @@
   left: 50%;
   bottom: 8px;
   z-index: 2;
-  min-width: 206px;
+  width: 214px;
   height: 52px;
   padding: 4px;
-  border: 0;
   background: var(--c-warm-beige);
   color: var(--c-slate);
-  cursor: pointer;
   pointer-events: auto;
   transform: translate(-50%, calc(100% + 16px));
   transition: transform 0.4s var(--story-ease);
@@ -643,37 +660,54 @@ html.footer-in .storynav:not(.storynav--open) .storynav__toggle {
 }
 
 .storynav__inner {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
+  align-items: stretch;
   height: 100%;
-  padding: 0 20px;
   border: 1px solid currentColor;
 }
 
+/* The pill's two halves: the left opens the categories, the right the
+   collections. Each is a button as wide as its half, with its mark at the
+   outer end; the name sits over the middle and takes no presses. */
+.storynav__half {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 20px;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.storynav__half--left {
+  justify-content: flex-start;
+}
+
+.storynav__half--right {
+  justify-content: flex-end;
+}
+
+.storynav__half:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: -5px;
+}
+
 .storynav__label {
-  display: inline-flex;
-  overflow: hidden;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  white-space: nowrap;
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 11px;
   line-height: 1.2;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-}
-
-.storynav__char {
-  display: inline-block;
-  animation: storynav-rise 0.35s var(--story-ease) both;
-  animation-delay: calc(var(--i, 0) * 15ms);
-}
-
-@keyframes storynav-rise {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
 }
 
 .storynav__icon {
@@ -749,7 +783,6 @@ html.footer-in .storynav:not(.storynav--open) .storynav__toggle {
   opacity: 0.55;
 }
 
-.storynav__item.is-active,
 .storynav__item:hover,
 .storynav__item:focus-visible {
   opacity: 1;
@@ -765,32 +798,21 @@ html.footer-in .storynav:not(.storynav--open) .storynav__toggle {
 
 .storynav__item-title {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.3rem);
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.storynav__cats {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px 22px;
-  margin: 40px 0 0;
-}
-
-.storynav__cat {
+/* Above either list: which one it is. */
+.storynav__heading {
+  margin: 0 0 30px;
   font-family: var(--font-body);
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--c-gold-light);
-  text-decoration: none;
-  opacity: 0.7;
-}
-
-.storynav__cat:hover,
-.storynav__cat:focus-visible {
-  opacity: 1;
+  opacity: 0.6;
 }
 
 .storynav__follower {

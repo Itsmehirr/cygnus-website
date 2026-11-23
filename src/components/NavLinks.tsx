@@ -4,9 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { site } from "@/content/site";
 
+/** The characters a row (name and line together) holds at full size. */
+const ROW = 35;
+
 /**
  * The Menu page's stacked items. Hover or focus expands an item into its line
  * and shows its numeral at the right edge, as on immersive-g.com's studio hub.
+ * A long name with a long line would not fit the screen as one sentence: its
+ * line is then set a little smaller, so the row stays as long as the others.
  */
 export function NavLinks() {
   const pathname = usePathname();
@@ -15,6 +20,7 @@ export function NavLinks() {
       {site.nav.map((item) => {
         const current =
           pathname === item.href || pathname.startsWith(`${item.href}/`);
+        const scale = Math.min(1, (ROW - item.label.length) / item.line.length);
         return (
           <li key={item.href} className="menu__item">
             <Link
@@ -23,7 +29,7 @@ export function NavLinks() {
               aria-current={current ? "page" : undefined}
             >
               <span className="menu__name">{item.label}</span>
-              <span className="menu__more" aria-hidden="true">
+              <span className="menu__more" aria-hidden="true" style={scale < 1 ? { fontSize: `${scale.toFixed(2)}em` } : undefined}>
                 {item.line}
               </span>
               <span className="menu__explore" aria-hidden="true">

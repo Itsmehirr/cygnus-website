@@ -43,38 +43,54 @@ export const categories: Category[] = [
 export type Collection = {
   slug: string;
   name: string;
-  /** Roman numeral shown in the chapter header and pill. */
+  /** Roman numeral shown beside the name in the menus. */
   numeral: string;
   /** Short line used on tiles. */
   line: string;
   /** Explicit sentence for metadata. */
   description: string;
-  /** Longer paragraph for the collection page. */
+  /** Longer paragraph for the collection page and its panel in the Design Sanctuary. */
   story: string;
-  /** Ground colour of the chapter's panels. */
-  ground: "beige" | "white";
-  /** Intro film for the chapter (arcade window, then full viewport). */
-  intro: { src: string; poster: string };
+  /** The picture that stands for the collection: its panel in the Design Sanctuary and the top of its page. */
+  hero: { src: string; alt: string };
   /** ★★ in the sitemap: a hairline frame treatment specific to this page. */
   framed?: boolean;
 };
 
+/**
+ * The house's collections, in order. The names are the house's; the lines,
+ * descriptions and stories are placeholders.
+ * TODO: replace with the house's approved collection texts.
+ */
 export const collections: Collection[] = [
   {
-    slug: "pearl",
-    name: "Pearl",
+    slug: "lumen",
+    name: "Lumen",
     numeral: "I",
-    line: "The first collection.",
+    line: "Light, given structure.",
     description:
-      "Pearl is the first Cygnus collection: pearls paired with the house’s engineered diamond geometries, set in noble metals.",
-    // TODO: replace with the house's approved collection text.
+      "Lumen is a Cygnus collection: engineered diamond geometries from grown carbon, cut for the way they hold and return light, set in noble metals.",
     story:
-      "Pearl is where the house begins: the oldest organic gem set against the newest geometry. Each piece holds the two in balance, so that neither explains the other.",
-    ground: "beige",
-    intro: { src: "/media/collections/pearl.mp4", poster: "/media/collections/pearl-poster.jpg" },
+      "Lumen takes its name from light. Each piece is built around a geometry cut to gather it and give it back, so that the stone, not the setting, carries the form.",
+    hero: { src: "/images/pieces/lumen-ring-02.jpg", alt: "Lumen, a Cygnus collection: rings resting on cut stone" },
+    framed: true,
+  },
+  {
+    slug: "apeiron",
+    name: "Apeiron",
+    numeral: "II",
+    line: "Form without limit.",
+    description:
+      "Apeiron is a Cygnus collection: engineered diamond geometries from grown carbon, set in noble metals as one continuous line.",
+    story:
+      "Apeiron is the Greek for the boundless. Its pieces follow a single line with no beginning and no end, turning round the body as one structure.",
+    hero: { src: "/images/pieces/apeiron-necklace-01.jpg", alt: "Apeiron, a Cygnus collection: a single line worn at the neck" },
     framed: true,
   },
 ];
+
+/** The film behind the arches of the Design Sanctuary (then full viewport). */
+export const sanctuaryFilm = { src: "/media/sanctuary.mp4", poster: "/media/sanctuary-poster.jpg" };
 
 export const getCategory = (slug: string) =>
   categories.find((c) => c.slug === slug);
