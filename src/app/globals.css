@@ -1363,10 +1363,10 @@ html:not(.is-intro):not(.is-ready) .hero__count {
   will-change: opacity;
 }
 
-/* ---------- Home: the sculpted wall (Immersive Garden's plaster relief) ----------
-   One fixed WebGL layer under the page, drawing only shading onto the stone,
-   so the motifs read as carved from the ground itself. Sections stay
-   transparent; the footer's charcoal simply covers it. */
+/* ---------- The sculpted wall (Immersive Garden's plaster relief) ----------
+   One fixed WebGL layer under the page, drawing only shading onto the stone:
+   a forest pressed flat into the ground that swells out where the cursor
+   passes. Sections stay transparent; the footer's charcoal simply covers it. */
 
 .relief {
   position: fixed;

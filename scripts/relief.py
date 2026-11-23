@@ -1,23 +1,30 @@
 """
-Plaster relief maps for the Home background (Immersive Garden's sculpted wall).
+Plaster relief maps for the sculpted wall behind Home and the Menu (after
+Immersive Garden's wall: flat until the cursor passes, then embossed).
 
-The page draws each relief as *shading only*: a grey map where 128 is the flat
-wall, darker is shadow and lighter is highlight. The WebGL layer adds that
-shading onto the stone ground, so the motifs look carved out of the same stone.
+The page draws the relief as *shading only*, laid onto the stone ground by a
+WebGL layer, so it looks pressed out of the same stone.
 
-Two ways to make a map:
+  python3 scripts/relief.py forest public/images/relief/forest \
+      b.png:b-depth.png c.png:c-depth.png d.png:d-depth.png a.png:a-depth.png
+      The forest the site uses. Each pair is a lit image of a dense relief
+      panel (16:9, light from the upper left) and its depth map (near =
+      bright); an optional third part, a.png:a-depth.png:-4, shifts a depth
+      map sideways where a tool returned it offset. The panels are joined
+      top to bottom into one strip that repeats down the page, overlapping so
+      figures from neighbours interleave, and the strip is written as tiles:
+      forest-0.webp ... (shading: grey 176 is a flat face in the light) and
+      forest-0-h.webp ... (height: which forms rise first), each with an -s
+      cut for phones and small windows.
 
-  python3 scripts/relief.py convert photo.png public/images/relief/swan.webp [1280 560]
-      From an image of a relief on a flat wall (the Higgsfield stand-ins, or a
-      real photograph later): the wall is estimated and removed, leaving the
-      relief's shading, centred on 128. With two widths it writes the page's
-      set: swan.webp and swan-h.webp (shading and height) at the first width
-      (desktop), swan-s.webp and swan-h-s.webp at the second (phones). Size
-      each to its largest placement: about 21.6 px per vw of width on desktop,
-      6 px per vw on phones. The height lets the page relight the relief with
-      the cursor.
+Single motifs (not used by the site now, kept for one-off reliefs):
 
-  python3 scripts/relief.py procedural public/images/relief
+  python3 scripts/relief.py convert photo.png out/swan.webp [1280 560]
+      From an image of one relief on a flat wall: the wall is estimated and
+      removed, leaving the relief's shading centred on 128. With two widths it
+      also writes the height map and the phone cuts.
+
+  python3 scripts/relief.py procedural out
       Draws the house's own motifs (swan feathers, the Cygnus constellation,
       blossoms, ripples) as height fields and lights them from the upper left.
 
@@ -388,8 +395,121 @@ def save_pair(arr, dst, w_desk, w_phone, gain=None):
         print(f"{out}  {cut.width}x{cut.height}  {os.path.getsize(out) // 1024} KB")
 
 
+# --------------------------------------------------------------------------
+# The forest: dense relief panels joined into one strip that repeats down
+# the page
+
+FOREST_W = 2048  # strip width in px: one screen width on desktop
+PANEL_H = 1152  # each panel is 16:9
+STEP = 1024  # a panel every 1024 rows, so neighbours overlap by 128
+ZERO = 176  # grey of a flat face in the light, in the forest's shading maps
+
+
+def _smooth(a, b, x):
+    t = np.clip((x - a) / (b - a), 0, 1)
+    return t * t * (3 - 2 * t)
+
+
+def forest_panel(photo, depth, shift=0):
+    """One panel: its shading (0 = a flat face in the light) and its height.
+
+    photo: a lit image of a dense plaster relief, light from the upper left.
+    depth: its depth map, near = bright. shift moves the depth sideways (px at
+    half the strip's width) where a tool returned it offset from the image.
+    """
+    im = Image.open(photo).convert("L").resize((FOREST_W, PANEL_H), Image.LANCZOS)
+    L = np.asarray(im).astype(np.float32) / 255.0
+    hw, hh = FOREST_W // 2, PANEL_H // 2
+    H = np.asarray(Image.open(depth).convert("L").resize((hw, hh), Image.LANCZOS)).astype(np.float32) / 255.0
+    if shift:
+        H = np.roll(H, shift, 1)
+    # The tone of a flat face in the light: raised plaster where the picture
+    # is locally even. A smooth surface fitted to it evens out the exposure.
+    # Against that tone a flat top carries no shading at all, so a form that
+    # is only starting to rise shows its slopes, never a pale ghost of itself.
+    Ls = np.asarray(im.resize((hw, hh), Image.LANCZOS)).astype(np.float32) / 255.0
+    rough = ndi.gaussian_filter(np.abs(Ls - ndi.gaussian_filter(Ls, 2.0)), 3.0)
+    raised = H > 0.45
+    faces = raised & (rough < np.percentile(rough[raised], 35))
+
+    def surface(w, h):
+        yy, xx = np.mgrid[0:h, 0:w]
+        u, v = xx / w - 0.5, yy / h - 0.5
+        return np.stack([np.ones_like(u), u, v, u * u, v * v, u * v], -1).astype(np.float32)
+
+    A = surface(hw, hh)
+    coef, *_ = np.linalg.lstsq(A[faces], Ls[faces], rcond=None)
+    coef[0] += np.median(Ls[faces] - A[faces] @ coef)
+    shade = L / (surface(FOREST_W, PANEL_H) @ coef) - 1.0
+    # Height decides what rises first. Spread a little past each outline and
+    # softened, so a figure brings its rim light and its cast shadow with it.
+    Hm = ndi.gaussian_filter(ndi.maximum_filter(H, size=9), 2.5)
+    print(f"{os.path.basename(photo)}: face tone {coef[0]:.3f}, shading {np.percentile(shade, 2):+.2f} to {np.percentile(shade, 99.5):+.2f}")
+    return shade, np.clip(Hm, 0, 1)
+
+
+def forest(dst, specs):
+    """Join the panels into one strip (wrapping top to bottom) and cut tiles."""
+    panels = [forest_panel(*s) for s in specs]
+    os.makedirs(os.path.dirname(dst) or ".", exist_ok=True)
+    n = len(panels)
+    rows, ov = n * STEP, PANEL_H - STEP
+    hrows, hpan, hov = rows // 2, PANEL_H // 2, ov // 2
+    shade = np.zeros((rows, FOREST_W), np.float32)
+    height = np.zeros((hrows, FOREST_W // 2), np.float32)
+    filled = np.zeros(hrows, bool)
+    # Each panel comes in over its top overlap and goes out over its bottom
+    # one; both stay near full strength where they meet, and the prouder
+    # relief wins, so figures from the two interleave with no weak band.
+    y = np.arange(hpan, dtype=np.float32) + 0.5
+    fade_h = _smooth(0.0, 0.65 * hov, y) * (1 - _smooth(hpan - 0.65 * hov, hpan, y))
+    fade = np.repeat(fade_h, 2)
+    for k, (S_k, H_k) in enumerate(panels):
+        ih = (k * STEP // 2 - hov // 2 + np.arange(hpan)) % hrows
+        i = (k * STEP - ov // 2 + np.arange(PANEL_H)) % rows
+        Hk, Sk = H_k * fade_h[:, None], S_k * fade[:, None]
+        under_h, under_s = height[ih], shade[i]
+        d = ndi.gaussian_filter(Hk, 4.0) - ndi.gaussian_filter(under_h, 4.0)
+        w = np.where(filled[ih][:, None], 1.0 / (1.0 + np.exp(-d / 0.05)), 1.0).astype(np.float32)
+        height[ih] = under_h * (1 - w) + Hk * w
+        wf = np.clip(ndi.zoom(w, 2, order=1), 0, 1)
+        shade[i] = under_s * (1 - wf) + Sk * wf
+        filled[ih] = True
+
+    def cut(arr, width, apron, suffix, quality):
+        """Tiles twice as wide as tall, with a few wrapped rows above and below
+        so the page's bilinear sampling meets no seam between them."""
+        img = Image.fromarray(arr, "L")
+        if img.width != width:
+            img = img.resize((width, img.height * width // img.width), Image.LANCZOS)
+        a = np.asarray(img)
+        th = width // 2
+        for t in range(a.shape[0] // th):
+            idx = (t * th - apron + np.arange(th + 2 * apron)) % a.shape[0]
+            out = f"{dst}-{t}{suffix}.webp"
+            Image.fromarray(a[idx], "L").convert("RGB").save(out, "WEBP", quality=quality, method=6)
+            print(f"{out}  {width}x{th + 2 * apron}  {os.path.getsize(out) // 1024} KB")
+
+    def grey(a):
+        return np.clip(ZERO + a * 255.0, 0, 255).astype(np.uint8)
+
+    h8 = np.clip(height * 255.0, 0, 255).astype(np.uint8)
+    # The full-size shading is softened a touch: it sheds the plaster's grain
+    # (the stone has its own) and a third of the bytes, not the carving.
+    cut(grey(ndi.gaussian_filter(shade, 0.6)), FOREST_W, 2, "", 74)
+    cut(grey(shade), FOREST_W // 2, 1, "-s", 72)
+    cut(h8, FOREST_W // 2, 1, "-h", 82)
+    cut(h8, FOREST_W // 4, 1, "-h-s", 82)
+
+
 if __name__ == "__main__":
-    if len(sys.argv) >= 3 and sys.argv[1] == "procedural":
+    if len(sys.argv) >= 4 and sys.argv[1] == "forest":
+        specs = []
+        for a in sys.argv[3:]:
+            photo, depth, *rest = a.split(":")
+            specs.append((photo, depth, int(rest[0]) if rest else 0))
+        forest(sys.argv[2], specs)
+    elif len(sys.argv) >= 3 and sys.argv[1] == "procedural":
         procedural(sys.argv[2])
     elif len(sys.argv) >= 4 and sys.argv[1] == "convert":
         if len(sys.argv) >= 6:

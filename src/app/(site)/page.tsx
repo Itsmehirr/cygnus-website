@@ -10,7 +10,7 @@ import { Hero } from "@/components/home/Hero";
 import { Dissolve, Paragraph } from "@/components/motion/Paragraph";
 import { ScrollTilt } from "@/components/motion/ScrollTilt";
 import { Pixelate } from "@/components/motion/Pixelate";
-import { ReliefWall, type Relief } from "@/components/home/ReliefWall";
+import { ReliefWall } from "@/components/home/ReliefWall";
 import { Reveal, Drift } from "@/components/motion/Reveal";
 import { SoundToggle } from "@/components/chrome/SoundToggle";
 import { Clip } from "@/components/Clip";
@@ -22,23 +22,6 @@ export const metadata: Metadata = pageMeta({
   description: site.definition,
   path: "/",
 });
-
-/* The sculpted wall: each relief belongs to a section and is placed as it
-   stands when that section is centred on screen (x and w in vw, y in vh). The
-   maps are made from the Higgsfield stand-in reliefs with scripts/relief.py
-   (convert); a photographed relief of the house's own replaces any of them. */
-const R = "/images/relief";
-const reliefs: Relief[] = [
-  { src: `${R}/swan-flight.webp`, aspect: 1.506, anchor: ".hero", x: 60, y: -15, w: 60, depth: 0.25, seed: 1, phone: { x: 58, y: -30, w: 104 } },
-  { src: `${R}/peonies.webp`, aspect: 1, anchor: ".pressed", x: 10, y: 12, w: 28, depth: 0.3, amount: 0.85, seed: 2 },
-  { src: `${R}/constellation.webp`, aspect: 1, anchor: ".reel", x: 90, y: -24, w: 32, depth: 0.35, seed: 3, phone: { x: 82, y: 26, w: 60 } },
-  { src: `${R}/branch.webp`, aspect: 1.506, anchor: ".approach", x: 52, y: 0, w: 72, depth: 0.2, amount: 0.8, seed: 4 },
-  { src: `${R}/swan-glide.webp`, aspect: 1.506, anchor: ".making .band:first-child", x: 76, y: 26, w: 42, depth: 0.3, seed: 5 },
-  { src: `${R}/feathers.webp`, aspect: 0.664, anchor: ".making .band--reverse", x: 18, y: 22, w: 24, depth: 0.3, seed: 6 },
-  { src: `${R}/peonies.webp`, aspect: 1, anchor: ".teaser", x: 90, y: 36, w: 28, depth: 0.35, flip: true, seed: 7 },
-  { src: `${R}/branch.webp`, aspect: 1.506, anchor: ".bespoke", x: 20, y: -32, w: 44, depth: 0.25, flip: true, seed: 8 },
-  { src: `${R}/constellation.webp`, aspect: 1, anchor: ".closing", x: 50, y: 0, w: 34, depth: 0.2, amount: 0.85, seed: 9 },
-];
 
 /* Home, in Immersive Garden's grammar on the house's stone: the axis (which is
    also the opening), the statement, the story film as the showreel, the house
@@ -207,7 +190,7 @@ export default function HomePage() {
       </section>
 
       <ScrollTilt />
-      <ReliefWall reliefs={reliefs} />
+      <ReliefWall />
 
       <Link href="/sanctuary" className="see-all" aria-label="Enter the Sanctuary">
         {["Enter", "the", "Sanctuary"].map((w, i, all) => (
