@@ -35,7 +35,9 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     // "Reduce motion" setting is deliberately not consulted).
     document.documentElement.dataset.motion = "full";
 
-    const instance = new Lenis({ lerp: 0.05, smoothWheel: true });
+    // Lenis would otherwise drop the glide (lerp 1) for anyone whose system
+    // asks for reduced motion.
+    const instance = new Lenis({ lerp: 0.05, smoothWheel: true, respectReducedMotion: false });
     instance.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);
