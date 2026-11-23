@@ -26,7 +26,7 @@ src/app
     sanctuary/          the Sanctuary story (collections as rooms), by category, by collection, piece pages → enquiry
     cygnature/          bespoke: film, picture, text → registration → a note from the house
     info/               facts, questions answered, write to us
-  menu/                 the Menu ("The House"): the reliefs carved in charcoal, lit by the cursor
+  menu/                 the Menu ("The House"): the forest carved in charcoal, rising under the cursor
   actions.ts            server actions: enquiry and registration (honeypot, validation, mail)
   sitemap.ts robots.ts llms.txt/   SEO / AEO / GEO surface
   globals.css story.css            design system, Home grammar, Sanctuary grammar
@@ -39,7 +39,7 @@ src/content             site facts, nav, home copy, collections, pieces, FAQ
 src/lib                 gsap registration, schema builders, metadata helper, mail adapter
 scripts/                stone-texture.py (the ground), relief.py (wall maps)
 public/media            films and their posters
-public/images           photography; relief/ holds the wall's shading maps
+public/images           photography; relief/ holds the forest's maps (the sculpted wall)
 public/textures         the stone ground
 ```
 
@@ -48,8 +48,8 @@ public/textures         the stone ground
 The site runs full motion for every visitor; like both references, it does not read the system "Reduce motion" setting.
 
 - **Home, after immersive-g.com.** The opening builds the axis in place (wordmark mask sweep, the line word by word, a counter that hands over to "Scroll"), then the chrome fades in. Paragraphs reveal line by line; statements dissolve in letter by letter; films and pictures arrive through a pixel mosaic (`Pixelate`); media lean with scroll speed (`ScrollTilt`). Lenis lerp 0.05. The cursor keeps the system pointer with three trailing dots and words from `data-cursor`. The Menu opens with an ink spreading from its corner.
-- **The sculpted wall.** `ReliefWall` draws plaster motifs onto the stone as shading only, one fixed WebGL layer under the page. Each relief belongs to a section (placements in `src/app/(site)/page.tsx`), rises out of the ground as that section nears the centre, trails the page and sinks back as it leaves. A light follows the cursor across it (relighting the carving from its height map, with a glint on the forms that face it) and the reliefs lean slightly towards it; on touch screens the light wanders on its own. It starts only after the opening, when the browser is idle, and uploads its maps one per frame.
-- **The Menu** uses the same wall in its dark theme: the reliefs carved in the charcoal (placements in `src/components/chrome/MenuGround.tsx`), barely visible until the cursor's chartreuse-white light finds them, with a faint iridescence on the glints; the light wanders when nobody moves.
+- **The sculpted wall.** `ReliefWall` lays one continuous forest (swans, peonies, flowering branches, feathers, constellations) over the whole ground: one fixed WebGL layer under the page, drawn as shading only. It lies flat in the stone until the cursor passes; there it swells out, the tall figures first and the undergrowth after them, and it sinks back along the trail about three seconds later, as on the reference. Every block of text keeps a clearing, so the forest forms round the content and never under the words. The strip is one screen wide and repeats down the page every two screen widths; its tiles load as the page reaches them, after the opening, and nothing is drawn while the wall is flat. On touch screens it rises under the finger and wanders on its own when nobody touches.
+- **The Menu** carries the same forest in its dark theme (`src/components/chrome/MenuGround.tsx`): carved in the charcoal, the forms keep the stone's tone and catch a chartreuse-white light on their edges, under a soft pool of light at the cursor.
 - **Sanctuary, after collabcapitolium.fr.** Each collection is a pinned room: five round-topped arches onto one film, the centre arch opening to full screen, the gold script title rising and scrolling, panels travelling right to left on the diagonal, the room sliding away left. A framed pill opens the slate nav panel. Lenis 1.2 s expo on this route.
 
 ## Assets: where to drop them
@@ -63,21 +63,24 @@ A missing file falls back to a poster or tonal placeholder; adding the file need
 | Making films | `public/media/making-01.mp4`, `making-02.mp4` (+ `.jpg` posters) | 3:4 for the second |
 | Atelier film | `public/media/atelier.mp4` (+ `.jpg`) | Home and Cygnature |
 | Piece photography | `public/images/pieces/<slug>-01.jpg`, `-02.jpg` | listed per piece in `src/content/pieces.ts` |
-| Relief maps | `public/images/relief/<name>.webp`, `<name>-h.webp` and their `-s` phone cuts | shading and height, see below |
+| Forest maps | `public/images/relief/forest-<n>.webp`, `forest-<n>-h.webp` and their `-s` cuts | shading and height tiles of the wall, see below |
 | Wordmark | `public/wordmark.svg` | replace the placeholder; keep the name |
 | OG image, favicon | `public/og.jpg`, `public/favicon.ico` | |
 
-The films and reliefs in the repo are stand-ins generated with Higgsfield from brand-book stills.
+The films in the repo are stand-ins generated with Higgsfield from brand-book stills; the forest's panels are stand-ins generated with Magnific (GPT 2.6, with depth maps by Hi3D Relief).
 
-### Relief maps
+### The forest's maps
 
-The wall draws grey shading maps where 128 is the flat wall, darker is shadow and lighter is light. To make one from any lit image of a relief on a flat wall (a photograph, or a generated stand-in):
+The wall is built from lit images of dense relief panels (16:9, light from the upper left) and a depth map of each (near = bright):
 
 ```bash
-python3 scripts/relief.py convert photo.png public/images/relief/swan-flight.webp 1280 560
+python3 scripts/relief.py forest public/images/relief/forest \
+  b.png:b-depth.png c.png:c-depth.png d.png:d-depth.png a.png:a-depth.png
 ```
 
-writes the shading and height maps and their phone cuts (`swan-flight.webp`, `swan-flight-h.webp`, `swan-flight-s.webp`, `swan-flight-h-s.webp`). Size each to its largest placement, about 21.6 px per vw of width on desktop and 6 px per vw on phones (the swan in flight spans 60 vw, so 1280 and 560). Keep an existing name to replace a relief, or add an entry to `reliefs` in `src/app/(site)/page.tsx`.
+joins the panels top to bottom into one strip that wraps (neighbours overlap, so their figures interleave) and cuts it into tiles: `forest-0.webp` and so on (shading: grey 176 is a flat face in the light, darker is shadow, lighter is light) and `forest-0-h.webp` and so on (height: which forms rise first), each with an `-s` cut for phones and small windows. Four panels make the four tiles `ReliefWall` expects (`FOREST.tiles`). A third part, `a.png:a-depth.png:-4`, shifts a depth map sideways where a tool returned it offset.
+
+The current panels are in the Magnific library: creations `yiQThgcPW9`, `WDSarAHcXe`, `1lX6T5Ar4r` and `rgBiWX1xtc`, with depth maps `fHngzZECDY`, `LwIZ88WswO`, `SyvzhCRUb8` and `LwIZpNGswO` (the last one sits 4 px to the right, hence `:-4`). The maps in the repo were built from their previews (2048 px panels, 1024 px depth); a rebuild from the full-size originals would be a little crisper.
 
 ### Fonts
 
