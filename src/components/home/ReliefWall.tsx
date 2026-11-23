@@ -276,14 +276,15 @@ export function ReliefWall({ theme = "light", waitForIntro = true, start = 0 }: 
       gl.clearColor(0, 0, 0, 0);
 
       // ---- The forest's tiles: asked for as the page reaches them, decoded
-      // off the main thread, then sent to the GPU one a frame.
+      // off the main thread, then handed to the GPU one a frame.
       let w = window.innerWidth;
       let h = window.innerHeight;
       let dpr = Math.min(window.devicePixelRatio || 1, w < 720 ? 1.25 : 1.5);
       const cut = Math.max(w, MIN_WORLD) * dpr <= 1300 ? "-s" : "";
       type Tile = { shade: WebGLTexture | null; height: WebGLTexture | null; sv: [number, number]; hv: [number, number]; asked: boolean; ready: number };
       const tiles: Tile[] = Array.from({ length: FOREST.tiles }, () => ({ shade: null, height: null, sv: [0, 1], hv: [0, 1], asked: false, ready: 0 }));
-      const queue: { tile: Tile; kind: "shade" | "height"; img: HTMLImageElement }[] = [];
+      type Source = HTMLImageElement | ImageBitmap;
+      const queue: { tile: Tile; kind: "shade" | "height"; src: Source }[] = [];
       let disposed = false;
       let uploading = 0;
       let dirty = true;
@@ -291,39 +292,54 @@ export function ReliefWall({ theme = "light", waitForIntro = true, start = 0 }: 
         uploading = 0;
         const next = queue.shift();
         if (!next || disposed) return;
-        const { tile, kind, img } = next;
+        const { tile, kind, src } = next;
+        const [sw, sh] = src instanceof HTMLImageElement ? [src.naturalWidth, src.naturalHeight] : [src.width, src.height];
         const tex = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, gl.LUMINANCE, gl.UNSIGNED_BYTE, img);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, gl.LUMINANCE, gl.UNSIGNED_BYTE, src);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        if (!(src instanceof HTMLImageElement)) src.close();
         // A tile is twice as wide as tall; the rows beyond that are its
         // neighbours' edges, there so sampling meets no seam.
-        const rows = img.naturalWidth / 2;
-        const v: [number, number] = [(img.naturalHeight - rows) / 2 / img.naturalHeight, rows / img.naturalHeight];
+        const rows = sw / 2;
+        const v: [number, number] = [(sh - rows) / 2 / sh, rows / sh];
         tile[kind] = tex;
         if (kind === "shade") tile.sv = v;
         else tile.hv = v;
         dirty = true;
         if (queue.length) uploading = requestAnimationFrame(upload);
       };
+      // A bitmap decodes off the main thread and reaches the GPU in a couple
+      // of milliseconds (an <img> costs a whole frame there); where bitmaps
+      // are missing, the <img> still works.
+      const fetchMap = async (url: string): Promise<Source> => {
+        if (typeof createImageBitmap === "function") {
+          try {
+            const res = await fetch(url, { priority: "low" } as RequestInit);
+            if (res.ok) return await createImageBitmap(await res.blob(), { premultiplyAlpha: "none", colorSpaceConversion: "none" });
+          } catch {
+            // fall through
+          }
+        }
+        const img = new Image();
+        img.decoding = "async";
+        img.src = url;
+        await img.decode();
+        return img;
+      };
       const ask = (i: number) => {
         const tile = tiles[i];
         if (tile.asked) return;
         tile.asked = true;
         for (const kind of ["height", "shade"] as const) {
-          const img = new Image();
-          img.decoding = "async";
-          (img as HTMLImageElement & { fetchPriority?: string }).fetchPriority = "low";
-          img.src = `${FOREST.src}-${i}${kind === "height" ? "-h" : ""}${cut}.webp`;
-          img
-            .decode()
-            .then(() => {
+          fetchMap(`${FOREST.src}-${i}${kind === "height" ? "-h" : ""}${cut}.webp`)
+            .then((src) => {
               if (disposed) return;
-              queue.push({ tile, kind, img });
+              queue.push({ tile, kind, src });
               if (!uploading) uploading = requestAnimationFrame(upload);
             })
             .catch(() => {});
