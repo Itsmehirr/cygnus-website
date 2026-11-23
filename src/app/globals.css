@@ -799,7 +799,8 @@ html:not(.is-ready):has(.hero) .sound {
 
 .menu__close,
 .menu__write,
-.menu__est {
+.menu__est,
+.menu__foot .sound--inline {
   font-size: var(--text-sm);
   letter-spacing: 0.02em;
 }
@@ -1531,6 +1532,27 @@ html:not(.is-intro):not(.is-ready) .hero__count {
 
 .sound__state {
   opacity: 0.6;
+  /* "On" and "Off" take the same room, so nothing shifts when it flips. */
+  display: inline-block;
+  min-width: 1.9em;
+}
+
+/* In the flow (the footer's last line, the Menu's foot): it takes the type
+   and the colour of the line it sits in. */
+.sound--inline {
+  position: static;
+  mix-blend-mode: normal;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+/* A finger needs more to land on than a pointer does. */
+@media (pointer: coarse) {
+  .sound {
+    padding: 14px 0;
+    margin: -8px 0;
+  }
 }
 
 @media (max-width: 719px) {
@@ -2128,7 +2150,12 @@ html:not(.is-intro):not(.is-ready) .hero__count {
 }
 
 html.footer-in .see-all,
-html.footer-in .sound {
+html.footer-in .sound:not(.sound--inline) {
   opacity: 0;
   pointer-events: none;
+  /* Out of the tab order too, once faded: the footer has its own switch. */
+  visibility: hidden;
+  transition:
+    opacity 1.5s linear,
+    visibility 0s linear 1.5s;
 }

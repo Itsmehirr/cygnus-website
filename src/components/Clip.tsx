@@ -19,6 +19,7 @@ export function Clip({
   ratio = "landscape",
   label = "Film to follow",
   story = false,
+  sound = false,
   sizes = "(min-width: 880px) 60vw, 100vw",
   priority = false,
 }: {
@@ -27,6 +28,8 @@ export function Clip({
   ratio?: Ratio;
   label?: string;
   story?: boolean;
+  /** The film has a soundtrack of its own: it is unmuted while Sound is on. */
+  sound?: boolean;
   sizes?: string;
   /** Above the fold / likely LCP: preload the still and fetch it first. */
   priority?: boolean;
@@ -48,6 +51,7 @@ export function Clip({
         preload="metadata"
         aria-label={label}
         {...(story ? { "data-story": true } : {})}
+        {...(sound ? { "data-sound": true } : {})}
       />
     );
   }

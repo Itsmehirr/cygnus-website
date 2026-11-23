@@ -4,6 +4,7 @@ import { site } from "@/content/site";
 import { NavLinks } from "@/components/NavLinks";
 import { Wordmark } from "@/components/Wordmark";
 import { MenuGround } from "@/components/chrome/MenuGround";
+import { SoundToggle } from "@/components/chrome/SoundToggle";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -39,6 +40,7 @@ export default function MenuPage() {
         <a href={`mailto:${site.email}`} className="menu__write" data-cursor="Write">
           Write to us
         </a>
+        <SoundToggle inline />
         <span className="menu__est">Founded {site.founded}</span>
       </div>
     </main>

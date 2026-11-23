@@ -6,6 +6,7 @@ import { ScrollProvider } from "@/components/motion/ScrollProvider";
 import { Cursor } from "@/components/chrome/Cursor";
 import { InkTransition } from "@/components/motion/InkTransition";
 import { FilmConductor } from "@/components/motion/FilmConductor";
+import { Ambience } from "@/components/chrome/Ambience";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
@@ -69,6 +70,7 @@ export default function RootLayout({
         <Cursor />
         <InkTransition />
         <FilmConductor />
+        <Ambience />
         {/* Cookieless; they collect once Web Analytics and Speed Insights are switched on for the Vercel project. */}
         <Analytics />
         <SpeedInsights />

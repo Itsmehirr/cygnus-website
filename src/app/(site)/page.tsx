@@ -12,7 +12,6 @@ import { ScrollTilt } from "@/components/motion/ScrollTilt";
 import { Pixelate } from "@/components/motion/Pixelate";
 import { ReliefWall } from "@/components/home/ReliefWall";
 import { Reveal, Drift } from "@/components/motion/Reveal";
-import { SoundToggle } from "@/components/chrome/SoundToggle";
 import { Clip } from "@/components/Clip";
 import { Picture } from "@/components/Picture";
 import { ButtonLink } from "@/components/Button";
@@ -51,7 +50,7 @@ export default function HomePage() {
         <Reveal className="reel__frame" data-tilt="">
           <div className="reel__media" data-cursor={videoReady ? "Watch" : undefined}>
             <Pixelate>
-              <Clip src={site.storyVideo.src} poster={posterReady ? site.storyVideo.poster : undefined} ratio="landscape" label="The story of Cygnus" story sizes="(min-width: 880px) 65vw, 100vw" />
+              <Clip src={site.storyVideo.src} poster={posterReady ? site.storyVideo.poster : undefined} ratio="landscape" label="The story of Cygnus" story sound={site.storyVideo.sound} sizes="(min-width: 880px) 65vw, 100vw" />
             </Pixelate>
             <span className="reel__label">
               <span className="reel__play" aria-hidden="true" />
@@ -200,7 +199,6 @@ export default function HomePage() {
         ))}
         <span className="see-all__dot" aria-hidden="true" />
       </Link>
-      <SoundToggle />
     </>
   );
 }

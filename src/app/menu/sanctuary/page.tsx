@@ -3,6 +3,7 @@ import Link from "next/link";
 import { categories, collections } from "@/content/collections";
 import { Wordmark } from "@/components/Wordmark";
 import { MenuGround } from "@/components/chrome/MenuGround";
+import { SoundToggle } from "@/components/chrome/SoundToggle";
 
 export const metadata: Metadata = {
   title: "Collections",
@@ -63,6 +64,7 @@ export default function SanctuaryMenuPage() {
         <Link href="/menu" className="menu__write" data-cursor="Menu">
           The house
         </Link>
+        <SoundToggle inline />
         <span className="menu__est">Every piece leads to an enquiry</span>
       </div>
     </main>

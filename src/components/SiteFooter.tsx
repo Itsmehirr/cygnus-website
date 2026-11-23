@@ -2,6 +2,7 @@ import Link from "next/link";
 import { site } from "@/content/site";
 import { Wordmark } from "./Wordmark";
 import { FooterMotion } from "./motion/FooterMotion";
+import { SoundToggle } from "./chrome/SoundToggle";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -67,6 +68,8 @@ export function SiteFooter() {
           <span>
             © {year} {site.name}. All rights reserved.
           </span>
+          {/* The fixed switch steps aside for the footer; this one takes over. */}
+          <SoundToggle inline />
           <span>Engineered beauty.</span>
         </div>
       </div>

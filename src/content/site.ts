@@ -77,6 +77,8 @@ export const site = {
     src: "/media/story.mp4",
     poster: "/media/story-poster.jpg",
     caption: "The Cygnus story",
+    /** Set once the film carries its own soundtrack: it is then unmuted while Sound is on. */
+    sound: false,
   },
 } as const;
 

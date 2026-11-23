@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { gsap } from "@/lib/gsap";
 import { useLenis } from "@/components/motion/ScrollProvider";
+import { armSound, getSound, subscribeSound } from "@/lib/ambience";
 
 /**
  * Immersive Garden's cursor (CursorElt + HomeScrollCursor): the system pointer
@@ -11,6 +12,8 @@ import { useLenis } from "@/components/motion/ScrollProvider";
  * part vertically as the page moves fast. Over anything that carries
  * `data-cursor`, the dots step aside and the word appears beside the pointer,
  * its letters fading in (0.8 s, staggered over 0.4 s), fading out in 0.5 s.
+ * Until the visitor has let the sound in, the word beside the pointer is the
+ * reference's own, "Click to enable sound", and the first click does so.
  *
  * The Sanctuary keeps Capitolium's grammar instead: the system cursor and
  * circular hotspots on the images, so this stays hidden there.
@@ -37,6 +40,8 @@ export function Cursor() {
       spread = 0,
       seen = false,
       word = "",
+      over: HTMLElement | null = null,
+      later = 0,
       tl: gsap.core.Timeline | null = null;
 
     const onMove = (e: PointerEvent) => {
@@ -47,11 +52,13 @@ export function Cursor() {
         x = lx = mx;
         y = ly = my;
         d.classList.add("is-on");
+        refresh();
       }
     };
     const onLeave = () => {
       seen = false;
       d.classList.remove("is-on");
+      refresh();
     };
 
     const show = (text: string) => {
@@ -74,10 +81,23 @@ export function Cursor() {
       gsap.set(l, { opacity: 1 });
       tl = gsap.timeline().fromTo(chars, { opacity: 0 }, { opacity: 1, duration: 0.8, stagger: 0.4 / chars.length, ease: "none" });
     };
-    const onOver = (e: Event) => {
-      const t = (e.target as HTMLElement).closest<HTMLElement>("[data-cursor]");
-      show(t?.dataset.cursor ?? "");
+    // What the pointer says: the word of the thing under it, else the
+    // invitation to sound while that is still open.
+    const refresh = () => {
+      const s = getSound();
+      show(over?.dataset.cursor || (seen && (!s.chosen || s.waiting) ? "Click to enable sound" : ""));
     };
+    const onOver = (e: Event) => {
+      over = (e.target as HTMLElement).closest<HTMLElement>("[data-cursor]");
+      refresh();
+    };
+    // When the sound changes, the word may too (the switch says "Mute" or
+    // "Sound"): read it once the page has caught up.
+    const unsubscribe = subscribeSound(() => {
+      window.cancelAnimationFrame(later);
+      later = window.requestAnimationFrame(refresh);
+    });
+    armSound(true);
 
     const tick = (_t: number, dt: number) => {
       const k = 1 - Math.exp(-0.1 * (dt / (1000 / 60)));
@@ -102,6 +122,9 @@ export function Cursor() {
       document.documentElement.removeEventListener("mouseleave", onLeave);
       document.removeEventListener("mouseover", onOver);
       gsap.ticker.remove(tick);
+      unsubscribe();
+      window.cancelAnimationFrame(later);
+      armSound(false);
       tl?.kill();
       d.classList.remove("is-on", "is-hidden");
       gsap.set(l, { opacity: 0 });

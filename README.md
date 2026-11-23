@@ -34,11 +34,11 @@ src/components
   home/                 Hero (opening), ReliefWall (the sculpted wall, Home and Menu)
   motion/               ScrollProvider (Lenis), Reveal, Paragraph + Dissolve, Pixelate, ScrollTilt, FilmConductor, InkTransition, FooterMotion
   sanctuary/            Story (room engine), StoryNav, Hotspot, ScrollThumb, GalleryDrift
-  chrome/               Cursor, Menu ground (dark relief wall; CSS light without WebGL), sound
+  chrome/               Cursor, Menu ground (dark relief wall; CSS light without WebGL), Ambience + SoundToggle (the sound and its switch)
 src/content             site facts, nav, home copy, collections, pieces, FAQ
-src/lib                 gsap registration, schema builders, metadata helper, mail adapter
-scripts/                stone-texture.py (the ground), relief.py (wall maps)
-public/media            films and their posters
+src/lib                 gsap registration, schema builders, metadata helper, mail adapter, ambience (the sound engine)
+scripts/                stone-texture.py (the ground), relief.py (wall maps), ambience.py (the soundscape)
+public/media            films and their posters; ambience.mp3 (the site's sound)
 public/images           photography; relief/ holds the forest's maps (the sculpted wall)
 public/textures         the stone ground
 ```
@@ -51,6 +51,7 @@ The site runs full motion for every visitor; like both references, it does not r
 - **The sculpted wall.** `ReliefWall` lays one continuous forest (swans, peonies, flowering branches, feathers, constellations) over the whole ground: one fixed WebGL layer under the page, drawn as shading only. It lies flat in the stone until the cursor passes; there it swells out, the tall figures first and the undergrowth after them, and it sinks back along the trail about three seconds later, as on the reference. Every block of text keeps a clearing, so the forest forms round the content and never under the words. The strip is one screen wide and repeats down the page every two screen widths; its tiles load as the page reaches them, after the opening, and nothing is drawn while the wall is flat. On touch screens it rises under the finger and wanders on its own when nobody touches.
 - **The Menu** carries the same forest in its dark theme (`src/components/chrome/MenuGround.tsx`): carved in the charcoal, the forms keep the stone's tone and catch a chartreuse-white light on their edges, under a soft pool of light at the cursor.
 - **Films.** One film plays in view at a time (`FilmConductor`). Chrome draws the whole page at 30 frames a second while two videos play on screen, which shows as a stutter in the scroll; so the film holding most of the screen plays (or the one under the pointer, or the story film with its sound on), another in view holds its frame until its turn, and two that share the screen for long take turns, a loop each.
+- **Sound.** One soft ambience for the whole site (`src/lib/ambience.ts`, mounted once in the root layout so it plays on through navigation): a slow pad in D major with a few glass chimes in a long room. It is off until the visitor lets it in. On a desktop the cursor says "Click to enable sound" and the first click anywhere switches it on, as on the reference; on touch screens, and on the pages without that cursor (the Sanctuary, the Menu), only the Sound switch does. The switch sits at the bottom right of every page, in the footer's last line once the footer arrives, and in the Menu's foot. The choice is remembered for the session; a page loaded with sound on waits for the first click or key, because browsers do not let audio start by itself. The track is fetched only when sound is switched on, loops with its last 6 seconds crossfaded into its first, fades in and out, and rests while the tab is hidden.
 - **Sanctuary, after collabcapitolium.fr.** Each collection is a pinned room: five round-topped arches onto one film, the centre arch opening to full screen, the gold script title rising and scrolling, panels travelling right to left on the diagonal, the room sliding away left. A framed pill opens the slate nav panel. Lenis 1.2 s expo on this route.
 
 ## Assets: where to drop them
@@ -59,7 +60,8 @@ A missing file falls back to a poster or tonal placeholder; adding the file need
 
 | Asset | Path | Notes |
 | --- | --- | --- |
-| Story film | `public/media/story.mp4` + `story-poster.jpg` | H.264, muted loop, fast start; poster = first frame |
+| Story film | `public/media/story.mp4` + `story-poster.jpg` | H.264, muted loop, fast start; poster = first frame. If the real film has a soundtrack, set `storyVideo.sound` in `src/content/site.ts`: it is then unmuted while Sound is on |
+| Ambience | `public/media/ambience.mp3` | the site's sound; any track that is at full level at both ends (no fade in or out baked in) and at least 20 s long. The stand-in is rendered by `python3 scripts/ambience.py public/media/ambience.mp3` |
 | Collection film | `public/media/collections/pearl.mp4` + `pearl-poster.jpg` | plays through the Sanctuary arches |
 | Making films | `public/media/making-01.mp4`, `making-02.mp4` (+ `.jpg` posters) | 3:4 for the second |
 | Atelier film | `public/media/atelier.mp4` (+ `.jpg`) | Home and Cygnature |

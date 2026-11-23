@@ -1,50 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-const remembered = () => {
-  if (typeof window === "undefined") return false;
-  try {
-    return sessionStorage.getItem("cygnus-sound") === "on";
-  } catch {
-    return false;
-  }
-};
+import { useSyncExternalStore } from "react";
+import { getServerSound, getSound, subscribeSound, toggleSound } from "@/lib/ambience";
 
 /**
- * Opt-in sound for the story video: muted by default, remembered for the
- * session. Sits bottom-right, as on immersive-g.com.
+ * The Sound switch: the site's ambience on or off, remembered for the
+ * session. Fixed at the bottom right of every page, as on immersive-g.com;
+ * `inline` sets it in the flow instead (the footer, the Menu).
  */
-export function SoundToggle() {
-  const [on, setOn] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-
-  // Read the remembered choice after hydration so server and client markup match.
-  useEffect(() => {
-    const id = window.requestAnimationFrame(() => {
-      setOn(remembered());
-      setHydrated(true);
-    });
-    return () => window.cancelAnimationFrame(id);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    document.querySelectorAll<HTMLVideoElement>("video[data-story]").forEach((v) => {
-      v.muted = !on;
-      if (on) v.play().catch(() => {});
-    });
-    try {
-      sessionStorage.setItem("cygnus-sound", on ? "on" : "off");
-    } catch {}
-  }, [on, hydrated]);
+export function SoundToggle({ inline = false }: { inline?: boolean }) {
+  const { on } = useSyncExternalStore(subscribeSound, getSound, getServerSound);
 
   return (
     <button
       type="button"
-      className="sound"
+      className={inline ? "sound sound--inline" : "sound"}
       aria-pressed={on}
-      onClick={() => setOn((v) => !v)}
+      onClick={toggleSound}
+      data-sound-switch
       data-cursor={on ? "Mute" : "Sound"}
     >
       <span className="sound__word">Sound</span>
