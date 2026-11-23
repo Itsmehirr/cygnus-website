@@ -6,7 +6,8 @@
  *   anywhere switches it on, as on immersive-g.com. On touch screens, and on
  *   the pages without that cursor, only the Sound switch does.
  * - The choice is remembered for the session. A page loaded with sound on
- *   waits for the first click or key (browsers do not let audio start alone).
+ *   waits for the first click or key (browsers do not let audio start alone);
+ *   until then the switch reads Off, and pressing it lets the sound in.
  * - The track's last seconds are crossfaded into its first (equal power), so
  *   it loops without a seam; switching on fades in, switching off fades out,
  *   and a hidden tab rests.
@@ -32,7 +33,11 @@ const TRACK = {
   cross: 6,
   /** Output level: a background, not a soundtrack. */
   level: 0.55,
+  /** On phones and tablets, 3 dB more: their speakers lose the low half of
+   *  the pad, which measures as 2 to 5 dB of its loudness. */
+  small: 0.78,
 };
+const level = () => (typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches ? TRACK.small : TRACK.level);
 const KEY = "cygnus-sound";
 const SERVER: SoundState = { on: false, playing: false, chosen: false, waiting: false };
 
@@ -83,7 +88,11 @@ const context = () => {
   if (ctx) return ctx;
   const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AC) return null;
-  ctx = new AC({ latencyHint: "playback" });
+  try {
+    ctx = new AC({ latencyHint: "playback" });
+  } catch {
+    return null;
+  }
   master = ctx.createGain();
   master.gain.value = 0;
   meter = ctx.createAnalyser();
@@ -104,12 +113,19 @@ const load = async () => {
   buffer = await new Promise<AudioBuffer>((done, fail) => c.decodeAudioData(data, done, fail));
 };
 
+/** The master level's last fade. Where the level stands mid-fade is worked
+ *  out from this, not read back from the browser: not every browser reports
+ *  a level that is on its way somewhere, and a wrong reading would click. */
+let ramp = { from: 0, to: 0, t0: 0, t1: 0 };
+
 const fadeTo = (level: number, seconds: number) => {
   if (!ctx || !master) return;
   const now = ctx.currentTime;
+  const from = now >= ramp.t1 ? ramp.to : now <= ramp.t0 ? ramp.from : ramp.from + (ramp.to - ramp.from) * ((now - ramp.t0) / (ramp.t1 - ramp.t0));
   master.gain.cancelScheduledValues(now);
-  master.gain.setValueAtTime(master.gain.value, now);
+  master.gain.setValueAtTime(from, now);
   master.gain.linearRampToValueAtTime(level, now + seconds);
+  ramp = { from, to: level, t0: now, t1: now + seconds };
 };
 
 /** One pass of the track from `at`; every pass after the first rises out of
@@ -177,7 +193,7 @@ function go() {
     running = true;
     ahead();
   }
-  fadeTo(TRACK.level, 2.4);
+  fadeTo(level(), 2.4);
   set({ playing: true, waiting: false });
 }
 
@@ -198,7 +214,19 @@ const start = () => {
     }
   }
   window.clearTimeout(resting);
-  if (c.state !== "running") c.resume().catch(() => {});
+  if (c.state !== "running") {
+    c.resume().catch(() => {});
+    // Older iPhones let a context start only if something sounds inside the
+    // tap itself: one silent sample does.
+    try {
+      const kick = c.createBufferSource();
+      kick.buffer = c.createBuffer(1, 1, 22050);
+      kick.connect(c.destination);
+      kick.start(0);
+    } catch {
+      // nothing to unlock here
+    }
+  }
   loading ??= load().catch((error) => {
     loading = null;
     console.warn("[sound]", error);
@@ -230,13 +258,16 @@ const remember = (on: boolean) => {
 /** The visitor's own choice. Call it from a click (the Sound switch does). */
 export const chooseSound = (on: boolean) => {
   remember(on);
-  set({ on, chosen: true });
+  set({ on, chosen: true, waiting: false });
   if (on) start();
   else stop();
 };
-export const toggleSound = () => chooseSound(!state.on);
+/** The Sound switch. While the sound is wanted but still waiting to be let
+ *  in (a reload), the switch reads Off, and pressing it lets it in. */
+export const toggleSound = () => chooseSound(!state.on || state.waiting);
 
-/** The cursor that carries "Click to enable sound" says when it is on a page. */
+/** The cursor says when "Click to enable sound" is in front of the visitor:
+ *  it is on this page and the pointer has moved. */
 export const armSound = (on: boolean) => {
   armed = on;
 };
@@ -278,9 +309,13 @@ export const mountSound = () => {
     if (!state.chosen && armed && e.pointerType === "mouse" && e.button === 0) chooseSound(true);
     else if (state.on && !state.playing) start();
   };
-  // A tap only counts as the visitor's gesture once it is a click; a key does at once.
+  // A tap or a pen only counts as the visitor's gesture once it is a click
+  // (a screen with both a mouse and touch has the cursor, and its invitation,
+  // too). A click made from the keyboard is not one: detail is 0 there.
   const onClick = (e: MouseEvent) => {
-    if (!inSwitch(e.target) && state.on && !state.playing) start();
+    if (inSwitch(e.target)) return;
+    if (!state.chosen && armed && e.button === 0 && e.detail > 0) chooseSound(true);
+    else if (state.on && !state.playing) start();
   };
   const onKey = () => {
     if (state.on && !state.playing) start();

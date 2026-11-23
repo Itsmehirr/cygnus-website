@@ -59,7 +59,8 @@ export default function RootLayout({
     <html lang="en" className={`${bodyFont.variable} ${displayFont.variable} ${scriptFont.variable}`} suppressHydrationWarning>
       <body>
         <noscript>
-          <style>{`.header,.see-all,.sound{opacity:1!important;pointer-events:auto!important}`}</style>
+          {/* Without scripts the chrome shows at once, and the Sound switch, which could do nothing, does not. */}
+          <style>{`.header,.see-all{opacity:1!important;pointer-events:auto!important}.sound{display:none!important}`}</style>
         </noscript>
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />

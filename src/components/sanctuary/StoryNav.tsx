@@ -50,6 +50,12 @@ export function StoryNav({
     };
   }, []);
 
+  // The fixed Sound switch makes room for the pill on narrow screens (globals.css).
+  useEffect(() => {
+    document.documentElement.classList.add("has-storynav");
+    return () => document.documentElement.classList.remove("has-storynav");
+  }, []);
+
   // Label change: the new letters rise in, one after another (CSS, keyed on the label).
   useEffect(() => {
     const next = chapters[active]?.label ?? "Sanctuary";

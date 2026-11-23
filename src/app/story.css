@@ -613,6 +613,13 @@
   transform: translate(-50%, 0);
 }
 
+/* Like the other fixed cues, the pill steps away for the footer: on phones,
+   where it is always out, it would otherwise lie over the footer's last line
+   and the Sound switch in it. */
+html.footer-in .storynav:not(.storynav--open) .storynav__toggle {
+  transform: translate(-50%, calc(100% + 16px));
+}
+
 .storynav__toggle-clip {
   position: absolute;
   inset: 0;

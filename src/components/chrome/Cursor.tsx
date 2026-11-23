@@ -40,6 +40,8 @@ export function Cursor() {
       spread = 0,
       seen = false,
       word = "",
+      wide = 0,
+      leftward = false,
       over: HTMLElement | null = null,
       later = 0,
       tl: gsap.core.Timeline | null = null;
@@ -52,12 +54,15 @@ export function Cursor() {
         x = lx = mx;
         y = ly = my;
         d.classList.add("is-on");
+        // From here the invitation is in front of the visitor: their first click may let the sound in.
+        armSound(true);
         refresh();
       }
     };
     const onLeave = () => {
       seen = false;
       d.classList.remove("is-on");
+      armSound(false);
       refresh();
     };
 
@@ -78,6 +83,7 @@ export function Cursor() {
         l.appendChild(s);
         return s;
       });
+      wide = l.offsetWidth;
       gsap.set(l, { opacity: 1 });
       tl = gsap.timeline().fromTo(chars, { opacity: 0 }, { opacity: 1, duration: 0.8, stagger: 0.4 / chars.length, ease: "none" });
     };
@@ -97,13 +103,17 @@ export function Cursor() {
       window.cancelAnimationFrame(later);
       later = window.requestAnimationFrame(refresh);
     });
-    armSound(true);
 
     const tick = (_t: number, dt: number) => {
       const k = 1 - Math.exp(-0.1 * (dt / (1000 / 60)));
       x += (mx + 15 - x) * k;
       y += (my - y) * k;
-      lx += (mx + 18 - lx) * k;
+      // Near the right edge the word would run off the screen: it moves to
+      // the pointer's other side (and back only once there is clear room).
+      const room = window.innerWidth - (mx + 18 + wide);
+      if (room < 10) leftward = true;
+      else if (room > 48) leftward = false;
+      lx += ((leftward ? mx - 14 - wide : mx + 18) - lx) * k;
       ly += (my - ly) * k;
       const v = Math.min(18, Math.abs(lenis?.velocity ?? 0) * 0.5);
       spread += (v - spread) * 0.12;

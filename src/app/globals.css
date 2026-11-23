@@ -189,8 +189,10 @@ select {
   color: var(--c-charcoal);
 }
 
+/* The ring takes the ink of its surroundings, so it shows on the charcoal
+   bands and the Menu as well as on the stone. */
 :focus-visible {
-  outline: 1px solid var(--c-charcoal);
+  outline: 1px solid var(--c-ink);
   outline-offset: 4px;
 }
 
@@ -767,7 +769,26 @@ html:not(.is-ready):has(.hero) .sound {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 72px;
+  gap: 16px;
+  min-height: 72px;
+}
+
+/* With room to spare the Sound switch sits in the true centre, under the
+   links, whatever the lengths of the words either side of it. */
+@media (min-width: 600px) {
+  .menu__foot {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .menu__foot > :first-child {
+    justify-self: start;
+  }
+
+  .menu__foot > :last-child {
+    justify-self: end;
+    text-align: right;
+  }
 }
 
 /* The same top-right cluster as the header: "Close —" and the small mark. */
@@ -807,6 +828,24 @@ html:not(.is-ready):has(.hero) .sound {
 
 .menu__est {
   color: var(--c-ink-faint);
+}
+
+/* The foot is one line: its words do not wrap, and where the three would not
+   fit (small phones) the closing note gives way to the Sound switch. */
+.menu__foot > * {
+  white-space: nowrap;
+}
+
+@media (max-width: 343px) {
+  .menu__est {
+    display: none;
+  }
+}
+
+@media (max-width: 463px) {
+  .menu__est--long {
+    display: none;
+  }
 }
 
 .menu__nav {
@@ -997,12 +1036,27 @@ html:not(.is-ready):has(.hero) .sound {
   flex-wrap: wrap;
   gap: 12px 32px;
   justify-content: space-between;
+  /* The Sound switch is taller than the words either side; all three share a baseline. */
+  align-items: baseline;
   margin-top: var(--space-block);
   padding-top: 24px;
   border-top: 1px solid var(--c-line);
   font-size: var(--text-xs);
   letter-spacing: 0.08em;
   color: var(--c-ink-faint);
+}
+
+/* On one line, the Sound switch sits in the true centre of it. */
+@media (min-width: 720px) {
+  .footer__bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .footer__bottom > :last-child {
+    justify-self: end;
+    text-align: right;
+  }
 }
 
 /* ---------- Home: the axis (Immersive Garden's hero, also the opening) ---------- */
@@ -1528,6 +1582,33 @@ html:not(.is-intro):not(.is-ready) .hero__count {
 
 .sound {
   right: var(--gutter);
+}
+
+/* One Sound switch at a time: the fixed one shows only while none of those
+   set in the page (the footer's last line, the Menu's foot) is on screen.
+   SoundToggle says so with html.sound-fixed, once the page has been measured;
+   without scripts it never shows, and the switch would do nothing there. */
+html:not(.sound-fixed) .sound:not(.sound--inline) {
+  opacity: 0;
+  pointer-events: none;
+  /* Out of the tab order too: the page's own switch is the one to reach. */
+  visibility: hidden;
+  transition:
+    opacity 0.5s linear,
+    visibility 0s linear 0.5s;
+}
+
+/* The fixed switch inverts whatever lies behind it; so does its ring. */
+.sound:focus-visible {
+  outline-color: currentColor;
+}
+
+/* On the Sanctuary the framed pill holds the bottom centre; where the two
+   would meet (phones), the switch sits just above it. */
+@media (max-width: 519px) {
+  html.has-storynav .sound:not(.sound--inline) {
+    bottom: 68px;
+  }
 }
 
 .sound__state {
@@ -2149,11 +2230,10 @@ html:not(.is-intro):not(.is-ready) .hero__count {
   transform: translateX(25px);
 }
 
-html.footer-in .see-all,
-html.footer-in .sound:not(.sound--inline) {
+html.footer-in .see-all {
   opacity: 0;
   pointer-events: none;
-  /* Out of the tab order too, once faded: the footer has its own switch. */
+  /* Out of the tab order too, once faded. */
   visibility: hidden;
   transition:
     opacity 1.5s linear,
