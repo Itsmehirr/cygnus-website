@@ -1442,28 +1442,25 @@ html:not(.is-intro):not(.is-ready) .hero__count {
   will-change: transform;
 }
 
-/* ---------- Pixel transition (Immersive Garden's mosaic) ---------- */
+/* ---------- Media arrive by fading in (MediaFade) ---------- */
 
-.pixelate {
+.media-fade {
   position: relative;
 }
 
-.pixelate > video,
-.pixelate > div {
+.media-fade > video,
+.media-fade > div {
   display: block;
 }
 
-.pixelate.is-pending > :not(canvas) {
-  opacity: 0;
+.media-fade > * {
+  transition: opacity 1.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.pixelate__canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+/* Waiting below the screen (or for its file): out quickly, in slowly. */
+.media-fade.is-pending > * {
   opacity: 0;
-  pointer-events: none;
+  transition: opacity 0.3s linear;
 }
 
 /* ---------- Sanctuary: title band and gallery ---------- */

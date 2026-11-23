@@ -9,7 +9,7 @@ import { pageMeta } from "@/lib/seo";
 import { Hero } from "@/components/home/Hero";
 import { Dissolve, Paragraph } from "@/components/motion/Paragraph";
 import { ScrollTilt } from "@/components/motion/ScrollTilt";
-import { Pixelate } from "@/components/motion/Pixelate";
+import { MediaFade } from "@/components/motion/MediaFade";
 import { ReliefWall } from "@/components/home/ReliefWall";
 import { Reveal, Drift } from "@/components/motion/Reveal";
 import { Clip } from "@/components/Clip";
@@ -49,9 +49,9 @@ export default function HomePage() {
       <section className="reel" aria-label="The story of Cygnus">
         <Reveal className="reel__frame" data-tilt="">
           <div className="reel__media" data-cursor={videoReady ? "Watch" : undefined}>
-            <Pixelate>
+            <MediaFade>
               <Clip src={site.storyVideo.src} poster={posterReady ? site.storyVideo.poster : undefined} ratio="landscape" label="The story of Cygnus" story sound={site.storyVideo.sound} sizes="(min-width: 880px) 65vw, 100vw" />
-            </Pixelate>
+            </MediaFade>
             <span className="reel__label">
               <span className="reel__play" aria-hidden="true" />
               The story
@@ -80,9 +80,9 @@ export default function HomePage() {
           <div className="band">
             <Reveal className="band__media band__media--left" data-tilt="">
               <div className="band__frame" data-cursor="Discover">
-                <Pixelate>
+                <MediaFade>
                   <Clip src="/media/making-01.mp4" ratio="landscape" label="The making, I" />
-                </Pixelate>
+                </MediaFade>
               </div>
             </Reveal>
             <div className="band__text band__text--right">
@@ -96,9 +96,9 @@ export default function HomePage() {
           <div className="band band--reverse">
             <Reveal className="band__media band__media--right" data-tilt="">
               <div className="band__frame" data-cursor="Discover">
-                <Pixelate>
+                <MediaFade>
                   <Clip src="/media/making-02.mp4" ratio="portrait" label="The making, II" />
-                </Pixelate>
+                </MediaFade>
               </div>
             </Reveal>
             <div className="band__text band__text--left">
@@ -123,7 +123,7 @@ export default function HomePage() {
               <Drift key={p.slug} speed={[0.06, 0.16, 0.1][i]} className={`teaser__frame teaser__frame--${i + 1}`}>
                 <Reveal delay={i * 0.12} data-tilt="">
                   <Link href={`/sanctuary/pieces/${p.slug}`} className="tile tile--bare" data-cursor="Discover">
-                    <Pixelate>
+                    <MediaFade>
                       <Picture
                         src={p.images[0].src}
                         alt={p.images[0].alt}
@@ -131,7 +131,7 @@ export default function HomePage() {
                         sizes="(min-width: 880px) 28vw, 70vw"
                         label={p.name}
                       />
-                    </Pixelate>
+                    </MediaFade>
                   </Link>
                 </Reveal>
               </Drift>
@@ -152,14 +152,14 @@ export default function HomePage() {
           <div className="bespoke__grid">
             <Reveal className="bespoke__video" data-tilt="">
               <div className="band__frame" data-cursor="Discover">
-                <Pixelate>
+                <MediaFade>
                   <Clip src="/media/atelier.mp4" ratio="landscape" label="The atelier" />
-                </Pixelate>
+                </MediaFade>
               </div>
             </Reveal>
             <Reveal className="bespoke__picture" delay={0.15} data-tilt="">
               <div className="band__frame">
-                <Pixelate>
+                <MediaFade>
                   <Picture
                     src="/images/cygnature/hands.jpg"
                     alt="A Cygnus commission in the making"
@@ -167,7 +167,7 @@ export default function HomePage() {
                     sizes="(min-width: 880px) 24vw, 60vw"
                     label="Presence"
                   />
-                </Pixelate>
+                </MediaFade>
               </div>
             </Reveal>
             <div className="bespoke__text">

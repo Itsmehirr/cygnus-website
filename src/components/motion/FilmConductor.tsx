@@ -128,7 +128,7 @@ export function FilmConductor() {
 
     const filmAt = (target: EventTarget | null) => {
       if (!(target instanceof Element)) return null;
-      const v = target.closest("video.clip") ?? target.closest(".pixelate")?.querySelector("video.clip");
+      const v = target.closest("video.clip") ?? target.closest(".media-fade")?.querySelector("video.clip");
       return v instanceof HTMLVideoElement ? v : null;
     };
     const onOver = (e: PointerEvent) => {
